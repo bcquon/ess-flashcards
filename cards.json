@@ -1,0 +1,42 @@
+[
+  {
+    "unit": "Unit 1",
+    "term": "System",
+    "definition": "A set of interrelated components that work together and influence one another."
+  },
+  {
+    "unit": "Unit 2",
+    "term": "Species",
+    "definition": "A group of organisms that can interbreed and produce fertile offspring."
+  },
+  {
+    "unit": "Unit 3",
+    "term": "Niche",
+    "definition": "The role of a species in an ecosystem, including how it uses resources and interacts with others."
+  },
+  {
+    "unit": "Unit 4",
+    "term": "Pollution",
+    "definition": "The addition of a substance or agent to the environment at a rate faster than it can be rendered harmless."
+  },
+  {
+    "unit": "Unit 5",
+    "term": "Biocapacity",
+    "definition": "The capacity of an area to generate renewable biological resources and absorb wastes."
+  },
+  {
+    "unit": "Unit 6",
+    "term": "Carrying capacity",
+    "definition": "The maximum population size of a species that an environment can support over time."
+  },
+  {
+    "unit": "Unit 7",
+    "term": "Succession",
+    "definition": "The process of change in species composition in an ecosystem over time."
+  },
+  {
+    "unit": "Unit 8",
+    "term": "Sustainability",
+    "definition": "Using resources in a way that allows natural systems to continue functioning for the future."
+  }
+]

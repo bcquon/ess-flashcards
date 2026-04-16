@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IB ESS Flashcards Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 24px;
+      background: #f5f7fb;
+      color: #222;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      margin-bottom: 8px;
+    }
+
+    .controls {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+
+    button, select {
+      padding: 10px 14px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 28px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+      min-height: 220px;
+    }
+
+    .unit {
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 10px;
+    }
+
+    .term {
+      font-size: 32px;
+      font-weight: bold;
+      margin-bottom: 18px;
+    }
+
+    .definition {
+      font-size: 18px;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .definition.show {
+      display: block;
+    }
+
+    .status {
+      margin-top: 14px;
+      color: #555;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>IB ESS Flashcards Test</h1>
+    <p>This is a simple test site with 8 units and 1 vocabulary word in each unit.</p>
+
+    <div class="controls">
+      <select id="unitFilter">
+        <option value="all">All units</option>
+      </select>
+      <button id="showAnswerBtn">Show definition</button>
+      <button id="nextBtn">Next card</button>
+    </div>
+
+    <div class="card">
+      <div class="unit" id="unit"></div>
+      <div class="term" id="term">Loading...</div>
+      <div class="definition" id="definition"></div>
+      <div class="status" id="status"></div>
+    </div>
+  </div>
+
+  <script>
+    let allCards = [];
+    let filteredCards = [];
+    let currentIndex = 0;
+    let showingDefinition = false;
+
+    const unitEl = document.getElementById('unit');
+    const termEl = document.getElementById('term');
+    const definitionEl = document.getElementById('definition');
+    const statusEl = document.getElementById('status');
+    const unitFilterEl = document.getElementById('unitFilter');
+    const showAnswerBtn = document.getElementById('showAnswerBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    async function loadCards() {
+      try {
+        const response = await fetch('cards.json');
+        allCards = await response.json();
+        populateUnitFilter();
+        applyFilter();
+      } catch (error) {
+        termEl.textContent = 'Error loading cards.json';
+        definitionEl.textContent = 'Make sure index.html and cards.json are in the same folder on Gitee Pages.';
+        definitionEl.classList.add('show');
+      }
+    }
+
+    function populateUnitFilter() {
+      const units = [...new Set(allCards.map(card => card.unit))];
+      for (const unit of units) {
+        const option = document.createElement('option');
+        option.value = unit;
+        option.textContent = unit;
+        unitFilterEl.appendChild(option);
+      }
+    }
+
+    function applyFilter() {
+      const selectedUnit = unitFilterEl.value;
+      filteredCards = selectedUnit === 'all'
+        ? [...allCards]
+        : allCards.filter(card => card.unit === selectedUnit);
+
+      currentIndex = 0;
+      displayCard();
+    }
+
+    function displayCard() {
+      if (filteredCards.length === 0) {
+        unitEl.textContent = '';
+        termEl.textContent = 'No cards found';
+        definitionEl.textContent = '';
+        definitionEl.classList.remove('show');
+        statusEl.textContent = '';
+        return;
+      }
+
+      const card = filteredCards[currentIndex];
+      showingDefinition = false;
+
+      unitEl.textContent = card.unit;
+      termEl.textContent = card.term;
+      definitionEl.textContent = card.definition;
+      definitionEl.classList.remove('show');
+      showAnswerBtn.textContent = 'Show definition';
+      statusEl.textContent = `Card ${currentIndex + 1} of ${filteredCards.length}`;
+    }
+
+    function toggleDefinition() {
+      if (filteredCards.length === 0) return;
+      showingDefinition = !showingDefinition;
+      definitionEl.classList.toggle('show', showingDefinition);
+      showAnswerBtn.textContent = showingDefinition ? 'Hide definition' : 'Show definition';
+    }
+
+    function nextCard() {
+      if (filteredCards.length === 0) return;
+      currentIndex = (currentIndex + 1) % filteredCards.length;
+      displayCard();
+    }
+
+    unitFilterEl.addEventListener('change', applyFilter);
+    showAnswerBtn.addEventListener('click', toggleDefinition);
+    nextBtn.addEventListener('click', nextCard);
+
+    loadCards();
+  </script>
+</body>
+</html>

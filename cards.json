@@ -1,42 +1,110 @@
 [
   {
+    "id": "u1-vocab-system-sl",
     "unit": "Unit 1",
-    "term": "System",
-    "definition": "A set of interrelated components that work together and influence one another."
+    "level": "SL",
+    "category": "vocab",
+    "front": "System",
+    "back": "A set of interrelated components that work together and influence one another.",
+    "front_zh": "系统",
+    "back_zh": "由相互关联并彼此影响的组成部分构成的整体。",
+    "keywords": ["interrelated components", "influence one another"],
+    "image": ""
   },
   {
+    "id": "u1-concept-feedback-hl",
+    "unit": "Unit 1",
+    "level": "HL",
+    "category": "concept",
+    "front": "Explain positive and negative feedback in environmental systems.",
+    "back": "Positive feedback amplifies change, while negative feedback reduces change and stabilizes the system.",
+    "front_zh": "解释环境系统中的正反馈和负反馈。",
+    "back_zh": "正反馈会放大变化，负反馈会减少变化并稳定系统。",
+    "keywords": ["amplifies change", "stabilizes the system"],
+    "image": ""
+  },
+  {
+    "id": "u2-vocab-species-sl",
     "unit": "Unit 2",
-    "term": "Species",
-    "definition": "A group of organisms that can interbreed and produce fertile offspring."
+    "level": "SL",
+    "category": "vocab",
+    "front": "Species",
+    "back": "A group of organisms that can interbreed and produce fertile offspring.",
+    "front_zh": "物种",
+    "back_zh": "能够相互交配并产生可育后代的一组生物。",
+    "keywords": ["interbreed", "fertile offspring"],
+    "image": ""
   },
   {
+    "id": "u3-vocab-niche-sl",
     "unit": "Unit 3",
-    "term": "Niche",
-    "definition": "The role of a species in an ecosystem, including how it uses resources and interacts with others."
+    "level": "SL",
+    "category": "vocab",
+    "front": "Niche",
+    "back": "The role of a species in an ecosystem, including how it uses resources and interacts with others.",
+    "front_zh": "生态位",
+    "back_zh": "一个物种在生态系统中的角色，包括其如何利用资源并与其他生物互动。",
+    "keywords": ["role of a species", "uses resources"],
+    "image": ""
   },
   {
+    "id": "u4-concept-eutrophication-hl",
     "unit": "Unit 4",
-    "term": "Pollution",
-    "definition": "The addition of a substance or agent to the environment at a rate faster than it can be rendered harmless."
+    "level": "HL",
+    "category": "concept",
+    "front": "Outline the process of eutrophication.",
+    "back": "Nutrient enrichment leads to algal blooms, which reduce oxygen when decomposers break down dead biomass.",
+    "front_zh": "概述富营养化过程。",
+    "back_zh": "营养盐增加导致藻华，分解者分解死亡生物量时会消耗氧气。",
+    "keywords": ["nutrient enrichment", "algal blooms", "reduce oxygen"],
+    "image": ""
   },
   {
+    "id": "u5-vocab-biocapacity-sl",
     "unit": "Unit 5",
-    "term": "Biocapacity",
-    "definition": "The capacity of an area to generate renewable biological resources and absorb wastes."
+    "level": "SL",
+    "category": "vocab",
+    "front": "Biocapacity",
+    "back": "The capacity of an area to generate renewable biological resources and absorb wastes.",
+    "front_zh": "生物承载力",
+    "back_zh": "一个区域产生可再生生物资源并吸收废弃物的能力。",
+    "keywords": ["renewable biological resources", "absorb wastes"],
+    "image": "biocapacity.svg"
   },
   {
+    "id": "u6-vocab-carrying-capacity-sl",
     "unit": "Unit 6",
-    "term": "Carrying capacity",
-    "definition": "The maximum population size of a species that an environment can support over time."
+    "level": "SL",
+    "category": "vocab",
+    "front": "Carrying capacity",
+    "back": "The maximum population size of a species that an environment can support over time.",
+    "front_zh": "环境容纳量",
+    "back_zh": "环境在长期内能够支持的某一物种最大种群规模。",
+    "keywords": ["maximum population size", "support over time"],
+    "image": ""
   },
   {
+    "id": "u7-concept-succession-hl",
     "unit": "Unit 7",
-    "term": "Succession",
-    "definition": "The process of change in species composition in an ecosystem over time."
+    "level": "HL",
+    "category": "concept",
+    "front": "Compare primary and secondary succession.",
+    "back": "Primary succession starts on bare substrate with no soil, while secondary succession starts where soil remains after disturbance.",
+    "front_zh": "比较原生演替和次生演替。",
+    "back_zh": "原生演替从无土壤的裸地开始，次生演替在扰动后土壤仍存在的区域开始。",
+    "keywords": ["bare substrate", "soil remains"],
+    "image": ""
   },
   {
+    "id": "u8-vocab-sustainability-sl",
     "unit": "Unit 8",
-    "term": "Sustainability",
-    "definition": "Using resources in a way that allows natural systems to continue functioning for the future."
+    "level": "SL",
+    "category": "vocab",
+    "front": "Sustainability",
+    "back": "Using resources in a way that allows natural systems to continue functioning for the future.",
+    "front_zh": "可持续性",
+    "back_zh": "以使自然系统在未来继续运作的方式使用资源。",
+    "keywords": ["natural systems", "future"],
+    "image": ""
   }
 ]

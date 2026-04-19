@@ -506,7 +506,7 @@
       }
     }
 
-    function renderCurrent() {
+    function renderCurrent(resetBack = true) {
       if (filteredCards.length === 0) {
         metaEl.innerHTML = '';
         frontEl.textContent = 'No cards match current filters.';
@@ -519,7 +519,9 @@
       }
 
       const card = getCurrentCard();
-      showBack = false;
+      if (resetBack) {
+        showBack = false;
+      }
       renderMeta(card);
 
       studyAreaEl.classList.toggle('show', currentMode() === 'study');
@@ -554,7 +556,7 @@
 
     function toggleChinese() {
       showChinese = !showChinese;
-      renderCurrent();
+      renderCurrent(false);
     }
 
     function checkKeywords() {

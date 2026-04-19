@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="420" viewBox="0 0 800 420" role="img" aria-label="Biocapacity concept image">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#dbeafe"/>
+      <stop offset="100%" stop-color="#bbf7d0"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="420" fill="url(#g)"/>
+  <circle cx="170" cy="180" r="90" fill="#86efac" opacity="0.7"/>
+  <circle cx="320" cy="220" r="110" fill="#4ade80" opacity="0.65"/>
+  <circle cx="500" cy="190" r="95" fill="#22c55e" opacity="0.62"/>
+  <circle cx="645" cy="230" r="85" fill="#16a34a" opacity="0.55"/>
+  <text x="400" y="80" text-anchor="middle" font-family="Arial, sans-serif" font-size="40" fill="#14532d" font-weight="700">Biocapacity</text>
+  <text x="400" y="122" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#166534">renewable resources + waste absorption</text>
+</svg>

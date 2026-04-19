@@ -3,183 +3,583 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>IB ESS Flashcards Test</title>
+  <title>IB ESS Study Platform</title>
   <style>
+    :root {
+      --bg: #f5f7fb;
+      --card: #ffffff;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --line: #d1d5db;
+      --accent: #2563eb;
+      --success: #0f766e;
+      --error: #b91c1c;
+      --keyword: #fef08a;
+    }
+
+    * { box-sizing: border-box; }
+
     body {
-      font-family: Arial, sans-serif;
       margin: 0;
+      font-family: Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
       padding: 24px;
-      background: #f5f7fb;
-      color: #222;
     }
 
     .container {
-      max-width: 800px;
+      max-width: 960px;
       margin: 0 auto;
     }
 
-    h1 {
-      margin-bottom: 8px;
+    h1 { margin: 0 0 8px; }
+
+    .muted {
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px;
+      margin-top: 16px;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+    }
+
+    .group-title {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .check-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 180px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 15px;
+      cursor: pointer;
     }
 
     .controls {
       display: flex;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
-      margin: 20px 0;
+      align-items: center;
+      margin-top: 14px;
     }
 
-    button, select {
-      padding: 10px 14px;
-      font-size: 16px;
-      border: 1px solid #ccc;
+    button,
+    select,
+    input[type="text"] {
+      border: 1px solid var(--line);
       border-radius: 8px;
-      background: white;
-      cursor: pointer;
+      padding: 10px 12px;
+      font-size: 15px;
+      background: #fff;
+    }
+
+    button { cursor: pointer; }
+
+    .primary {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
     }
 
     .card {
-      background: white;
-      border-radius: 14px;
-      padding: 28px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-      min-height: 220px;
+      min-height: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .unit {
-      font-size: 14px;
-      color: #666;
-      margin-bottom: 10px;
+    .meta {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
     }
 
-    .term {
-      font-size: 32px;
-      font-weight: bold;
-      margin-bottom: 18px;
+    .pill {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 2px 10px;
+      background: #f9fafb;
     }
 
-    .definition {
+    .front {
+      font-size: 30px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin-top: 4px;
+    }
+
+    .zh {
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .back {
+      display: none;
       font-size: 18px;
       line-height: 1.5;
-      display: none;
     }
 
-    .definition.show {
-      display: block;
+    .back.show { display: block; }
+
+    mark {
+      background: var(--keyword);
+      padding: 0 3px;
+      border-radius: 3px;
     }
+
+    .card-image {
+      max-width: 100%;
+      max-height: 260px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      display: none;
+      object-fit: contain;
+      background: #fff;
+    }
+
+    .card-image.show { display: block; }
+
+    .quiz-area {
+      display: none;
+      margin-top: 4px;
+    }
+
+    .quiz-area.show { display: block; }
+
+    .choices {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .choice {
+      text-align: left;
+      width: 100%;
+    }
+
+    .feedback {
+      margin-top: 10px;
+      font-weight: 700;
+    }
+
+    .ok { color: var(--success); }
+    .bad { color: var(--error); }
 
     .status {
-      margin-top: 14px;
-      color: #555;
+      margin-top: 6px;
       font-size: 14px;
+      color: var(--muted);
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>IB ESS Flashcards Test</h1>
-    <p>This is a simple test site with 8 units and 1 vocabulary word in each unit.</p>
+    <h1>IB ESS Flashcards</h1>
+    <p class="muted">Choose filters, pick a mode, and study with study cards, multiple choice, or keyword quiz.</p>
 
-    <div class="controls">
-      <select id="unitFilter">
-        <option value="all">All units</option>
-      </select>
-      <button id="showAnswerBtn">Show definition</button>
-      <button id="nextBtn">Next card</button>
-    </div>
+    <section class="panel filters">
+      <div>
+        <h3 class="group-title">Units</h3>
+        <div id="unitFilters" class="check-list"></div>
+      </div>
+      <div>
+        <h3 class="group-title">Level</h3>
+        <div id="levelFilters" class="check-list"></div>
+      </div>
+      <div>
+        <h3 class="group-title">Type</h3>
+        <div id="categoryFilters" class="check-list"></div>
+      </div>
+    </section>
 
-    <div class="card">
-      <div class="unit" id="unit"></div>
-      <div class="term" id="term">Loading...</div>
-      <div class="definition" id="definition"></div>
+    <section class="panel">
+      <div class="controls">
+        <label for="modeSelect">Mode:</label>
+        <select id="modeSelect">
+          <option value="study">Study mode</option>
+          <option value="mcq">Multiple choice mode</option>
+          <option value="keyword">Keyword mode</option>
+        </select>
+
+        <button id="toggleAnswerBtn">Show answer (Space)</button>
+        <button id="nextBtn" class="primary">Next (→)</button>
+        <button id="toggleChineseBtn">Chinese: Off (C)</button>
+      </div>
+      <p class="muted" style="margin-top: 10px;">Shortcuts: <strong>C</strong> toggle Chinese, <strong>Space</strong> show/hide answer (study), <strong>→</strong> next card/question.</p>
+    </section>
+
+    <section class="panel card">
+      <div class="meta" id="meta"></div>
+      <div class="front" id="front">Loading...</div>
+      <div class="zh" id="frontZh"></div>
+
+      <div id="studyArea" class="quiz-area show">
+        <div id="back" class="back"></div>
+        <div class="zh" id="backZh"></div>
+      </div>
+
+      <div id="mcqArea" class="quiz-area">
+        <div id="mcqPrompt" style="font-size: 18px; line-height: 1.5;"></div>
+        <div id="choices" class="choices"></div>
+        <div id="mcqFeedback" class="feedback"></div>
+      </div>
+
+      <div id="keywordArea" class="quiz-area">
+        <div id="keywordPrompt" style="font-size: 18px; line-height: 1.5;"></div>
+        <div class="controls" style="margin-top: 8px;">
+          <input type="text" id="keywordInput" placeholder="Type keyword(s)" style="flex: 1; min-width: 220px;" />
+          <button id="checkKeywordBtn">Check</button>
+        </div>
+        <div id="keywordFeedback" class="feedback"></div>
+      </div>
+
+      <img id="cardImage" class="card-image" alt="Card visual" />
       <div class="status" id="status"></div>
-    </div>
+    </section>
   </div>
 
   <script>
+    const DEFAULT_LEVELS = ['SL', 'HL'];
+    const DEFAULT_CATEGORIES = ['vocab', 'concept'];
+
     let allCards = [];
     let filteredCards = [];
     let currentIndex = 0;
-    let showingDefinition = false;
+    let showChinese = false;
+    let showBack = false;
 
-    const unitEl = document.getElementById('unit');
-    const termEl = document.getElementById('term');
-    const definitionEl = document.getElementById('definition');
-    const statusEl = document.getElementById('status');
-    const unitFilterEl = document.getElementById('unitFilter');
-    const showAnswerBtn = document.getElementById('showAnswerBtn');
+    const unitFiltersEl = document.getElementById('unitFilters');
+    const levelFiltersEl = document.getElementById('levelFilters');
+    const categoryFiltersEl = document.getElementById('categoryFilters');
+
+    const modeSelectEl = document.getElementById('modeSelect');
+    const toggleAnswerBtn = document.getElementById('toggleAnswerBtn');
+    const toggleChineseBtn = document.getElementById('toggleChineseBtn');
     const nextBtn = document.getElementById('nextBtn');
+
+    const metaEl = document.getElementById('meta');
+    const frontEl = document.getElementById('front');
+    const frontZhEl = document.getElementById('frontZh');
+    const backEl = document.getElementById('back');
+    const backZhEl = document.getElementById('backZh');
+    const statusEl = document.getElementById('status');
+    const cardImageEl = document.getElementById('cardImage');
+
+    const studyAreaEl = document.getElementById('studyArea');
+    const mcqAreaEl = document.getElementById('mcqArea');
+    const keywordAreaEl = document.getElementById('keywordArea');
+
+    const mcqPromptEl = document.getElementById('mcqPrompt');
+    const choicesEl = document.getElementById('choices');
+    const mcqFeedbackEl = document.getElementById('mcqFeedback');
+
+    const keywordPromptEl = document.getElementById('keywordPrompt');
+    const keywordInputEl = document.getElementById('keywordInput');
+    const checkKeywordBtn = document.getElementById('checkKeywordBtn');
+    const keywordFeedbackEl = document.getElementById('keywordFeedback');
 
     async function loadCards() {
       try {
         const response = await fetch('cards.json');
         allCards = await response.json();
-        populateUnitFilter();
-        applyFilter();
+
+        buildCheckboxGroup(unitFiltersEl, uniqueValues(allCards, 'unit'), true);
+        buildCheckboxGroup(levelFiltersEl, DEFAULT_LEVELS, true);
+        buildCheckboxGroup(categoryFiltersEl, DEFAULT_CATEGORIES, true);
+
+        applyFilters();
       } catch (error) {
-        termEl.textContent = 'Error loading cards.json';
-        definitionEl.textContent = 'Make sure index.html and cards.json are in the same folder on Gitee Pages.';
-        definitionEl.classList.add('show');
+        frontEl.textContent = 'Error loading cards.json';
+        statusEl.textContent = 'Make sure index.html and cards.json are in the same folder.';
       }
     }
 
-    function populateUnitFilter() {
-      const units = [...new Set(allCards.map(card => card.unit))];
-      for (const unit of units) {
-        const option = document.createElement('option');
-        option.value = unit;
-        option.textContent = unit;
-        unitFilterEl.appendChild(option);
+    function uniqueValues(cards, field) {
+      return [...new Set(cards.map(card => card[field]).filter(Boolean))].sort();
+    }
+
+    function buildCheckboxGroup(container, values, checked) {
+      container.innerHTML = '';
+      for (const value of values) {
+        const id = `${container.id}-${String(value).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+        const label = document.createElement('label');
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.value = value;
+        input.checked = checked;
+        input.id = id;
+        input.addEventListener('change', applyFilters);
+        label.htmlFor = id;
+        label.appendChild(input);
+        label.append(document.createTextNode(value));
+        container.appendChild(label);
       }
     }
 
-    function applyFilter() {
-      const selectedUnit = unitFilterEl.value;
-      filteredCards = selectedUnit === 'all'
-        ? [...allCards]
-        : allCards.filter(card => card.unit === selectedUnit);
+    function selectedValues(container) {
+      return Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map((el) => el.value);
+    }
+
+    function applyFilters() {
+      const units = selectedValues(unitFiltersEl);
+      const levels = selectedValues(levelFiltersEl);
+      const categories = selectedValues(categoryFiltersEl);
+
+      filteredCards = allCards.filter(card =>
+        units.includes(card.unit) &&
+        levels.includes(card.level) &&
+        categories.includes(card.category)
+      );
 
       currentIndex = 0;
-      displayCard();
+      renderCurrent();
     }
 
-    function displayCard() {
+    function currentMode() {
+      return modeSelectEl.value;
+    }
+
+    function getCurrentCard() {
+      return filteredCards[currentIndex];
+    }
+
+    function escapeRegExp(text) {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function highlightKeywords(text, keywords = []) {
+      if (!text || !keywords.length) return text;
+      let html = text;
+      const sorted = [...keywords].sort((a, b) => b.length - a.length);
+      for (const keyword of sorted) {
+        if (!keyword) continue;
+        const regex = new RegExp(`(${escapeRegExp(keyword)})`, 'gi');
+        html = html.replace(regex, '<mark>$1</mark>');
+      }
+      return html;
+    }
+
+    function renderMeta(card) {
+      metaEl.innerHTML = '';
+      const tags = [card.unit, card.level, card.category];
+      for (const tag of tags) {
+        const el = document.createElement('span');
+        el.className = 'pill';
+        el.textContent = tag;
+        metaEl.appendChild(el);
+      }
+    }
+
+    function renderStudy(card) {
+      frontEl.textContent = card.front;
+      frontZhEl.textContent = showChinese && card.front_zh ? card.front_zh : '';
+      backEl.innerHTML = highlightKeywords(card.back, card.keywords);
+      backZhEl.textContent = showChinese && card.back_zh && showBack ? card.back_zh : '';
+      backEl.classList.toggle('show', showBack);
+      toggleAnswerBtn.textContent = showBack ? 'Hide answer (Space)' : 'Show answer (Space)';
+      renderImage(card);
+    }
+
+    function shuffled(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function buildMcqOptions(card) {
+      const direction = Math.random() < 0.5 ? 'front-to-back' : 'back-to-front';
+      const correct = direction === 'front-to-back' ? card.back : card.front;
+
+      const pool = shuffled(filteredCards.filter(c => c.id !== card.id))
+        .map(c => (direction === 'front-to-back' ? c.back : c.front))
+        .filter(Boolean);
+
+      const distractors = [];
+      for (const candidate of pool) {
+        if (candidate !== correct && !distractors.includes(candidate)) {
+          distractors.push(candidate);
+        }
+        if (distractors.length === 3) break;
+      }
+
+      const options = shuffled([correct, ...distractors]).slice(0, 4);
+      return { direction, correct, options };
+    }
+
+    function renderMcq(card) {
+      const { direction, correct, options } = buildMcqOptions(card);
+      const prompt = direction === 'front-to-back'
+        ? `Choose the correct answer for: ${card.front}`
+        : `Choose the matching front for: ${card.back}`;
+
+      frontEl.textContent = 'Multiple Choice';
+      frontZhEl.textContent = showChinese && card.front_zh ? `参考: ${card.front_zh}` : '';
+      mcqPromptEl.textContent = prompt;
+      choicesEl.innerHTML = '';
+      mcqFeedbackEl.textContent = '';
+      mcqFeedbackEl.className = 'feedback';
+
+      for (const option of options) {
+        const btn = document.createElement('button');
+        btn.className = 'choice';
+        btn.textContent = option;
+        btn.addEventListener('click', () => {
+          const isCorrect = option === correct;
+          mcqFeedbackEl.textContent = isCorrect ? 'Correct!' : 'Not quite.';
+          mcqFeedbackEl.classList.add(isCorrect ? 'ok' : 'bad');
+        });
+        choicesEl.appendChild(btn);
+      }
+
+      renderImage(card);
+    }
+
+    function renderKeyword(card) {
+      frontEl.textContent = 'Keyword Quiz';
+      frontZhEl.textContent = showChinese && card.front_zh ? `参考: ${card.front_zh}` : '';
+      keywordPromptEl.textContent = card.back;
+      keywordInputEl.value = '';
+      keywordFeedbackEl.textContent = '';
+      keywordFeedbackEl.className = 'feedback';
+      renderImage(card);
+    }
+
+    function renderImage(card) {
+      if (card.image) {
+        cardImageEl.src = `images/${card.image}`;
+        cardImageEl.classList.add('show');
+      } else {
+        cardImageEl.removeAttribute('src');
+        cardImageEl.classList.remove('show');
+      }
+    }
+
+    function renderCurrent() {
       if (filteredCards.length === 0) {
-        unitEl.textContent = '';
-        termEl.textContent = 'No cards found';
-        definitionEl.textContent = '';
-        definitionEl.classList.remove('show');
-        statusEl.textContent = '';
+        metaEl.innerHTML = '';
+        frontEl.textContent = 'No cards match current filters.';
+        frontZhEl.textContent = '';
+        backEl.textContent = '';
+        backZhEl.textContent = '';
+        cardImageEl.classList.remove('show');
+        statusEl.textContent = 'Try selecting more units, levels, or categories.';
         return;
       }
 
-      const card = filteredCards[currentIndex];
-      showingDefinition = false;
+      const card = getCurrentCard();
+      showBack = false;
+      renderMeta(card);
 
-      unitEl.textContent = card.unit;
-      termEl.textContent = card.term;
-      definitionEl.textContent = card.definition;
-      definitionEl.classList.remove('show');
-      showAnswerBtn.textContent = 'Show definition';
+      studyAreaEl.classList.toggle('show', currentMode() === 'study');
+      mcqAreaEl.classList.toggle('show', currentMode() === 'mcq');
+      keywordAreaEl.classList.toggle('show', currentMode() === 'keyword');
+
+      if (currentMode() === 'study') {
+        renderStudy(card);
+      } else if (currentMode() === 'mcq') {
+        renderMcq(card);
+      } else {
+        renderKeyword(card);
+      }
+
+      toggleAnswerBtn.disabled = currentMode() !== 'study';
       statusEl.textContent = `Card ${currentIndex + 1} of ${filteredCards.length}`;
+      toggleChineseBtn.textContent = `Chinese: ${showChinese ? 'On' : 'Off'} (C)`;
     }
 
-    function toggleDefinition() {
-      if (filteredCards.length === 0) return;
-      showingDefinition = !showingDefinition;
-      definitionEl.classList.toggle('show', showingDefinition);
-      showAnswerBtn.textContent = showingDefinition ? 'Hide definition' : 'Show definition';
+    function toggleAnswer() {
+      if (currentMode() !== 'study' || filteredCards.length === 0) return;
+      showBack = !showBack;
+      const card = getCurrentCard();
+      renderStudy(card);
     }
 
     function nextCard() {
       if (filteredCards.length === 0) return;
       currentIndex = (currentIndex + 1) % filteredCards.length;
-      displayCard();
+      renderCurrent();
     }
 
-    unitFilterEl.addEventListener('change', applyFilter);
-    showAnswerBtn.addEventListener('click', toggleDefinition);
+    function toggleChinese() {
+      showChinese = !showChinese;
+      renderCurrent();
+    }
+
+    function checkKeywords() {
+      if (filteredCards.length === 0 || currentMode() !== 'keyword') return;
+      const card = getCurrentCard();
+      const expected = (card.keywords || []).map(k => k.toLowerCase());
+      const input = keywordInputEl.value.toLowerCase();
+
+      if (expected.length === 0) {
+        keywordFeedbackEl.textContent = 'This card has no keyword list yet.';
+        keywordFeedbackEl.classList.add('bad');
+        return;
+      }
+
+      const missing = expected.filter(k => !input.includes(k));
+      if (missing.length === 0) {
+        keywordFeedbackEl.textContent = 'Great! You included all expected keywords.';
+        keywordFeedbackEl.classList.add('ok');
+      } else {
+        keywordFeedbackEl.textContent = `Missing keyword(s): ${missing.join(', ')}`;
+        keywordFeedbackEl.classList.add('bad');
+      }
+    }
+
+    modeSelectEl.addEventListener('change', renderCurrent);
+    toggleAnswerBtn.addEventListener('click', toggleAnswer);
+    toggleChineseBtn.addEventListener('click', toggleChinese);
     nextBtn.addEventListener('click', nextCard);
+    checkKeywordBtn.addEventListener('click', checkKeywords);
+    keywordInputEl.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') checkKeywords();
+    });
+
+    document.addEventListener('keydown', (event) => {
+      const target = event.target;
+      const typing = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA');
+
+      if (event.key === 'c' || event.key === 'C') {
+        event.preventDefault();
+        toggleChinese();
+      } else if (event.key === ' ' && !typing) {
+        event.preventDefault();
+        toggleAnswer();
+      } else if (event.key === 'ArrowRight' && !typing) {
+        event.preventDefault();
+        nextCard();
+      }
+    });
 
     loadCards();
   </script>

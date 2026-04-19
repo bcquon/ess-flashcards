@@ -6,11 +6,11 @@
   <title>IB ESS Study Platform</title>
   <style>
     :root {
-      --bg: #f5f7fb;
+      --bg: #eef2ff;
       --card: #ffffff;
       --text: #1f2937;
       --muted: #6b7280;
-      --line: #d1d5db;
+      --line: #d7ddea;
       --accent: #2563eb;
       --success: #0f766e;
       --error: #b91c1c;
@@ -21,18 +21,18 @@
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
       background: var(--bg);
       color: var(--text);
-      padding: 24px;
+      padding: 16px;
     }
 
     .container {
-      max-width: 960px;
+      max-width: 980px;
       margin: 0 auto;
     }
 
-    h1 { margin: 0 0 8px; }
+    h1 { margin: 0 0 4px; }
 
     .muted {
       color: var(--muted);
@@ -44,19 +44,21 @@
       background: var(--card);
       border: 1px solid var(--line);
       border-radius: 12px;
-      padding: 16px;
-      margin-top: 16px;
+      padding: 14px;
+      margin-top: 12px;
+      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.06);
     }
 
     .filters {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
     }
 
     .group-title {
       margin: 0 0 8px;
-      font-size: 14px;
+      font-size: 12px;
+      font-weight: 700;
       color: var(--muted);
       text-transform: uppercase;
       letter-spacing: 0.04em;
@@ -64,27 +66,28 @@
 
     .check-list {
       display: flex;
-      flex-direction: column;
+      flex-wrap: wrap;
       gap: 8px;
-      max-height: 180px;
-      overflow: auto;
-      padding-right: 4px;
     }
 
     label {
-      display: flex;
+      display: inline-flex;
       align-items: center;
-      gap: 8px;
-      font-size: 15px;
+      gap: 6px;
+      font-size: 14px;
       cursor: pointer;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 10px;
+      background: #f8faff;
     }
 
     .controls {
       display: flex;
-      gap: 10px;
+      gap: 8px;
       flex-wrap: wrap;
       align-items: center;
-      margin-top: 14px;
+      margin-top: 8px;
     }
 
     button,
@@ -92,8 +95,8 @@
     input[type="text"] {
       border: 1px solid var(--line);
       border-radius: 8px;
-      padding: 10px 12px;
-      font-size: 15px;
+      padding: 8px 10px;
+      font-size: 14px;
       background: #fff;
     }
 
@@ -106,10 +109,11 @@
     }
 
     .card {
-      min-height: 280px;
+      min-height: 340px;
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 10px;
+      padding: 18px;
     }
 
     .meta {
@@ -128,10 +132,12 @@
     }
 
     .front {
-      font-size: 30px;
+      font-size: clamp(34px, 5vw, 54px);
       font-weight: 700;
-      line-height: 1.2;
-      margin-top: 4px;
+      line-height: 1.08;
+      margin-top: 8px;
+      letter-spacing: -0.02em;
+      max-width: 26ch;
     }
 
     .zh {
@@ -141,8 +147,10 @@
 
     .back {
       display: none;
-      font-size: 18px;
-      line-height: 1.5;
+      font-size: 19px;
+      line-height: 1.6;
+      border-top: 1px solid var(--line);
+      padding-top: 12px;
     }
 
     .back.show { display: block; }
@@ -192,9 +200,24 @@
     .bad { color: var(--error); }
 
     .status {
-      margin-top: 6px;
+      margin-top: auto;
       font-size: 14px;
       color: var(--muted);
+    }
+
+    .shortcuts {
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 820px) {
+      .filters {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        min-height: 280px;
+      }
     }
   </style>
 </head>
@@ -231,7 +254,7 @@
         <button id="nextBtn" class="primary">Next (→)</button>
         <button id="toggleChineseBtn">Chinese: Off (C)</button>
       </div>
-      <p class="muted" style="margin-top: 10px;">Shortcuts: <strong>C</strong> toggle Chinese, <strong>Space</strong> show/hide answer (study), <strong>→</strong> next card/question.</p>
+      <p class="muted shortcuts">Shortcuts: <strong>C</strong> toggle Chinese, <strong>Space</strong> show/hide answer (study), <strong>→</strong> next card/question.</p>
     </section>
 
     <section class="panel card">

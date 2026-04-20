@@ -508,17 +508,11 @@
     const DEFAULT_LEVELS = ['SL', 'HL'];
     const DEFAULT_CATEGORIES = ['vocab', 'concept'];
 
-    let allCards = [];
-    let filteredCards = [];
-    let studyOrder = [];
-    let currentIndex = 0;
-    let showChinese = false;
-    let showBack = false;
+    let allCards = []; let filteredCards = []; let studyOrder = []; let currentIndex = 0; let showChinese = false; let showBack = false;
 
     const unitFiltersEl = document.getElementById('unitFilters');
     const levelFiltersEl = document.getElementById('levelFilters');
     const categoryFiltersEl = document.getElementById('categoryFilters');
-
     const modeSelectEl = document.getElementById('modeSelect');
     const toggleAnswerBtn = document.getElementById('toggleAnswerBtn');
     const toggleChineseBtn = document.getElementById('toggleChineseBtn');
@@ -527,140 +521,129 @@
     const cardStageEl = document.getElementById('cardStage');
     const statusEl = document.getElementById('status');
 
+    // --- NEW: LOCAL STORAGE SNAPSHOT FUNCTIONS ---
+    function saveState() {
+      const state = {
+        units: selectedValues(unitFiltersEl),
+        levels: selectedValues(levelFiltersEl),
+        categories: selectedValues(categoryFiltersEl),
+        mode: modeSelectEl.value,
+        showChinese: showChinese,
+        currentIndex: currentIndex,
+        studyOrderIds: studyOrder.map(c => c.id) // Saves the randomized order!
+      };
+      localStorage.setItem('essFlashcardsState', JSON.stringify(state));
+    }
+
+    function setCheckboxes(container, values) {
+      if (!values || !Array.isArray(values)) return;
+      const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+      checkboxes.forEach(cb => { cb.checked = values.includes(cb.value); });
+    }
+
+    function restoreStudyOrder(savedIds) {
+      const restored = [];
+      const filteredMap = new Map(filteredCards.map(c => [c.id, c]));
+      for (const id of savedIds) {
+        if (filteredMap.has(id)) {
+          restored.push(filteredMap.get(id));
+          filteredMap.delete(id); // Remove so we don't duplicate
+        }
+      }
+      // If you added new cards to JSON since the last save, shuffle them in at the end
+      const remaining = Array.from(filteredMap.values());
+      if (remaining.length > 0) restored.push(...shuffled(remaining));
+      studyOrder = restored;
+    }
+    // ---------------------------------------------
+
     async function loadCards() {
       try {
         const response = await fetch('cards.json');
         allCards = await response.json();
-
+        
+        // Build checkboxes with default values first
         buildCheckboxGroup(unitFiltersEl, uniqueValues(allCards, 'unit'), true);
         buildCheckboxGroup(levelFiltersEl, DEFAULT_LEVELS, true);
         buildCheckboxGroup(categoryFiltersEl, DEFAULT_CATEGORIES, true);
 
-        applyFilters();
+        // Check if we have a saved snapshot
+        const saved = localStorage.getItem('essFlashcardsState');
+        let loadedState = null;
+        if (saved) {
+          try { loadedState = JSON.parse(saved); } catch(e) {}
+        }
+
+        if (loadedState) {
+          // 1. Restore the UI settings
+          if (loadedState.mode) modeSelectEl.value = loadedState.mode;
+          showChinese = !!loadedState.showChinese;
+          if (loadedState.units) setCheckboxes(unitFiltersEl, loadedState.units);
+          if (loadedState.levels) setCheckboxes(levelFiltersEl, loadedState.levels);
+          if (loadedState.categories) setCheckboxes(categoryFiltersEl, loadedState.categories);
+
+          // 2. Filter the cards based on those saved settings
+          const units = selectedValues(unitFiltersEl); const levels = selectedValues(levelFiltersEl); const categories = selectedValues(categoryFiltersEl);
+          filteredCards = allCards.filter(card => units.includes(card.unit) && levels.includes(card.level) && categories.includes(card.category));
+
+          // 3. Restore the exact randomized order and the card index
+          if (loadedState.studyOrderIds) restoreStudyOrder(loadedState.studyOrderIds);
+          else rebuildStudyOrder();
+          
+          currentIndex = loadedState.currentIndex || 0;
+          resetPositionIfNeeded();
+          renderCurrent();
+        } else {
+          // If no save exists, run a fresh start
+          applyFilters();
+        }
       } catch (error) {
-        cardStageEl.innerHTML = `
-          <div class="panel-content empty-state">
-            <div style="font-size: 28px; font-weight: 800; color: var(--text);">Error loading cards.json</div>
-            <div>Make sure index.html and cards.json are in the same folder.</div>
-          </div>
-        `;
+        cardStageEl.innerHTML = `<div class="panel-content empty-state"><div style="font-size: 28px; font-weight: 800; color: var(--text);">Error loading cards.json</div></div>`;
       }
     }
 
-    function uniqueValues(cards, field) {
-      return [...new Set(cards.map(card => card[field]).filter(Boolean))].sort();
-    }
-
+    function uniqueValues(cards, field) { return [...new Set(cards.map(card => card[field]).filter(Boolean))].sort(); }
     function buildCheckboxGroup(container, values, checked) {
       container.innerHTML = '';
       for (const value of values) {
         const id = `${container.id}-${String(value).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
-        const label = document.createElement('label');
-        label.className = 'filter-chip';
-        const input = document.createElement('input');
-        input.type = 'checkbox';
-        input.value = value;
-        input.checked = checked;
-        input.id = id;
-        input.addEventListener('change', applyFilters);
-        label.htmlFor = id;
-        label.appendChild(input);
-        label.append(document.createTextNode(value));
+        const label = document.createElement('label'); label.className = 'filter-chip';
+        const input = document.createElement('input'); input.type = 'checkbox'; input.value = value; input.checked = checked; input.id = id;
+        input.addEventListener('change', applyFilters); label.htmlFor = id; label.appendChild(input); label.append(document.createTextNode(value));
         container.appendChild(label);
       }
     }
-
-    function selectedValues(container) {
-      return Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(el => el.value);
-    }
-
-    function shuffled(array) {
-      const copy = [...array];
-      for (let i = copy.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-      }
-      return copy;
-    }
-
-    function rebuildStudyOrder() {
-      studyOrder = shuffled(filteredCards);
-      currentIndex = 0;
-      showBack = false;
-    }
+    
+    function selectedValues(container) { return Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(el => el.value); }
+    function shuffled(array) { const copy = [...array]; for (let i = copy.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [copy[i], copy[j]] = [copy[j], copy[i]]; } return copy; }
+    function rebuildStudyOrder() { studyOrder = shuffled(filteredCards); currentIndex = 0; showBack = false; }
 
     function applyFilters() {
-      const units = selectedValues(unitFiltersEl);
-      const levels = selectedValues(levelFiltersEl);
-      const categories = selectedValues(categoryFiltersEl);
-
-      filteredCards = allCards.filter(card =>
-        units.includes(card.unit) &&
-        levels.includes(card.level) &&
-        categories.includes(card.category)
-      );
-
-      rebuildStudyOrder();
-      renderCurrent();
+      const units = selectedValues(unitFiltersEl); const levels = selectedValues(levelFiltersEl); const categories = selectedValues(categoryFiltersEl);
+      filteredCards = allCards.filter(card => units.includes(card.unit) && levels.includes(card.level) && categories.includes(card.category));
+      rebuildStudyOrder(); renderCurrent();
     }
 
-    function currentMode() {
-      return modeSelectEl.value;
-    }
-
-    function activeDeck() {
-      return currentMode() === 'study' ? studyOrder : filteredCards;
-    }
-
-    function getCurrentCard() {
-      return activeDeck()[currentIndex];
-    }
+    function currentMode() { return modeSelectEl.value; }
+    function activeDeck() { return currentMode() === 'study' ? studyOrder : filteredCards; }
+    function getCurrentCard() { return activeDeck()[currentIndex]; }
 
     function resetPositionIfNeeded() {
       const deck = activeDeck();
-      if (!deck.length) {
-        currentIndex = 0;
-        return;
-      }
+      if (!deck.length) { currentIndex = 0; return; }
       if (currentIndex >= deck.length) currentIndex = 0;
       if (currentIndex < 0) currentIndex = deck.length - 1;
     }
 
-    function escapeRegExp(text) {
-	  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-	}
-
-    function highlightKeywords(text, keywords = []) {
-      // Disabled temporarily while quirks are worked out
-      return text;
-      
-      /*
-      if (!text || !keywords.length) return text;
-      let html = text;
-      const sorted = [...keywords].sort((a, b) => b.length - a.length);
-      for (const keyword of sorted) {
-        if (!keyword) continue;
-        const regex = new RegExp(`(${escapeRegExp(keyword)})`, 'gi');
-        html = html.replace(regex, '<mark>$1</mark>');
-      }
-      return html;
-      */
-    }
-
-    function renderMeta(card) {
-      return [card.unit, card.level, card.category]
-        .filter(Boolean) 
-        .map(tag => `<span class="pill">${tag}</span>`)
-        .join('');
-    }
+    function renderMeta(card) { return [card.unit, card.level, card.category].filter(Boolean).map(tag => `<span class="pill">${tag}</span>`).join(''); }
 
     function renderStudy(card) {
       const frontZh = showChinese && card.front_zh ? `<div class="zh">${card.front_zh}</div>` : '';
       const backZh = showChinese && card.back_zh ? `<div class="zh">${card.back_zh}</div>` : '';
-      const imageHtml = card.image ? `<img class="card-image${showBack ? ' show' : ''}" src="images/${card.image}" alt="Card visual" />` : '';
+      const imageHtml = card.image ? `<img class="card-image" src="images/${card.image}" alt="Card visual" />` : '';
 
       cardStageEl.innerHTML = `
-        <button class="flashcard-shell ${showBack ? 'is-flipped' : ''}" id="flashcardShell" aria-label="Flip card">
+        <button class="flashcard-shell" id="flashcardShell" aria-label="Flip card">
           <div class="flashcard-inner">
             <div class="card-face front-face">
               <div class="meta">${renderMeta(card)}</div>
@@ -673,7 +656,7 @@
             <div class="card-face back-face">
               <div class="meta">${renderMeta(card)}</div>
               <div class="face-center">
-                <div class="back-text">${highlightKeywords(card.back, card.keywords)}</div>
+                <div class="back-text">${card.back}</div>
                 ${backZh}
                 ${imageHtml}
               </div>
@@ -682,35 +665,24 @@
           </div>
         </button>
       `;
-
+      
       document.getElementById('flashcardShell').addEventListener('click', toggleAnswer);
-      toggleAnswerBtn.textContent = showBack ? 'Flip to front (Space)' : 'Flip card (Space)';
+      toggleAnswerBtn.textContent = 'Flip card (Space)';
     }
 
     function buildMcqOptions(card) {
       const direction = Math.random() < 0.5 ? 'front-to-back' : 'back-to-front';
       const correct = direction === 'front-to-back' ? card.back : card.front;
-
-      const pool = shuffled(filteredCards.filter(c => c.id !== card.id))
-        .map(c => (direction === 'front-to-back' ? c.back : c.front))
-        .filter(Boolean);
-
+      const pool = shuffled(filteredCards.filter(c => c.id !== card.id)).map(c => (direction === 'front-to-back' ? c.back : c.front)).filter(Boolean);
       const distractors = [];
-      for (const candidate of pool) {
-        if (candidate !== correct && !distractors.includes(candidate)) distractors.push(candidate);
-        if (distractors.length === 3) break;
-      }
-
+      for (const candidate of pool) { if (candidate !== correct && !distractors.includes(candidate)) distractors.push(candidate); if (distractors.length === 3) break; }
       const options = shuffled([correct, ...distractors]).slice(0, 4);
       return { direction, correct, options };
     }
 
     function renderMcq(card) {
       const { direction, correct, options } = buildMcqOptions(card);
-      const prompt = direction === 'front-to-back'
-        ? `Choose the correct answer for: ${card.front}`
-        : `Choose the matching front for: ${card.back}`;
-
+      const prompt = direction === 'front-to-back' ? `Choose the correct answer for: ${card.front}` : `Choose the matching front for: ${card.back}`;
       cardStageEl.innerHTML = `
         <div class="panel-content">
           <div class="meta">${renderMeta(card)}</div>
@@ -723,161 +695,61 @@
           </div>
         </div>
       `;
-
       const choicesEl = document.getElementById('choices');
       const mcqFeedbackEl = document.getElementById('mcqFeedback');
       options.forEach(option => {
-        const btn = document.createElement('button');
-        btn.className = 'choice';
-        btn.textContent = option;
+        const btn = document.createElement('button'); btn.className = 'choice'; btn.textContent = option;
         btn.addEventListener('click', () => {
-          const isCorrect = option === correct;
-          mcqFeedbackEl.textContent = isCorrect ? 'Correct!' : 'Not quite.';
-          mcqFeedbackEl.className = `feedback ${isCorrect ? 'ok' : 'bad'}`;
+          const isCorrect = option === correct; mcqFeedbackEl.textContent = isCorrect ? 'Correct!' : 'Not quite.'; mcqFeedbackEl.className = `feedback ${isCorrect ? 'ok' : 'bad'}`;
         });
         choicesEl.appendChild(btn);
       });
     }
 
-    function renderKeyword(card) {
-      cardStageEl.innerHTML = `
-        <div class="panel-content">
-          <div class="meta">${renderMeta(card)}</div>
-          <div class="face-center" style="width: 100%;">
-            <div class="front" style="font-size: clamp(24px, 3vw, 34px); max-width: 18ch;">Keyword Quiz</div>
-            ${showChinese && card.front_zh ? `<div class="zh">参考: ${card.front_zh}</div>` : ''}
-            <div style="font-size: clamp(18px, 2vw, 24px); line-height: 1.5; max-width: 32ch;">${card.back}</div>
-            <div class="controls" style="margin-top: 4px; width: min(720px, 100%);">
-              <input type="text" id="keywordInput" placeholder="Type keyword(s)" style="flex: 1; min-width: 220px;" />
-              <button id="checkKeywordBtn" class="primary">Check</button>
-            </div>
-            <div class="feedback" id="keywordFeedback"></div>
-          </div>
-        </div>
-      `;
-
-      const keywordInputEl = document.getElementById('keywordInput');
-      const checkKeywordBtn = document.getElementById('checkKeywordBtn');
-      checkKeywordBtn.addEventListener('click', checkKeywords);
-      keywordInputEl.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') checkKeywords();
-      });
-    }
-
     function renderCurrent() {
-      resetPositionIfNeeded();
-      const deck = activeDeck();
-
-      if (!deck.length) {
-        cardStageEl.innerHTML = `
-          <div class="panel-content empty-state">
-            <div style="font-size: 28px; font-weight: 800; color: var(--text);">No cards match current filters.</div>
-            <div>Try selecting more units, levels, or categories.</div>
-          </div>
-        `;
-        statusEl.textContent = 'No cards available';
-        return;
+      resetPositionIfNeeded(); const deck = activeDeck();
+      if (!deck.length) { 
+        cardStageEl.innerHTML = `<div class="panel-content empty-state"><div>No cards match current filters.</div></div>`; 
+        statusEl.textContent = 'No cards available'; 
+        saveState(); // Save the empty state
+        return; 
       }
-
       const card = getCurrentCard();
-      if (currentMode() === 'study') {
-        renderStudy(card);
-      } else if (currentMode() === 'mcq') {
-        renderMcq(card);
-      } else {
-        renderKeyword(card);
-      }
-
+      if (currentMode() === 'study') { renderStudy(card); } else if (currentMode() === 'mcq') { renderMcq(card); }
       statusEl.textContent = `Card ${currentIndex + 1} of ${deck.length}${currentMode() === 'study' ? ' • randomized order' : ''}`;
       toggleChineseBtn.textContent = `Chinese: ${showChinese ? 'On' : 'Off'} (C)`;
       toggleAnswerBtn.disabled = currentMode() !== 'study';
+      
+      saveState(); // <--- Takes a snapshot of your progress every time the screen updates!
     }
 
     function toggleAnswer() {
       if (currentMode() !== 'study' || !activeDeck().length) return;
       showBack = !showBack;
-      
       const shell = document.getElementById('flashcardShell');
       if (shell) {
         if (showBack) shell.classList.add('is-flipped');
         else shell.classList.remove('is-flipped');
       }
-      
       toggleAnswerBtn.textContent = showBack ? 'Flip to front (Space)' : 'Flip card (Space)';
     }
 
-    function nextCard() {
-      const deck = activeDeck();
-      if (!deck.length) return;
-      currentIndex = (currentIndex + 1) % deck.length;
-      showBack = false;
-      renderCurrent();
-    }
+    function nextCard() { const deck = activeDeck(); if (!deck.length) return; currentIndex = (currentIndex + 1) % deck.length; showBack = false; renderCurrent(); }
+    function previousCard() { const deck = activeDeck(); if (!deck.length) return; currentIndex = (currentIndex - 1 + deck.length) % deck.length; showBack = false; renderCurrent(); }
+    function toggleChinese() { showChinese = !showChinese; renderCurrent(); }
 
-    function previousCard() {
-      const deck = activeDeck();
-      if (!deck.length) return;
-      currentIndex = (currentIndex - 1 + deck.length) % deck.length;
-      showBack = false;
-      renderCurrent();
-    }
-
-    function toggleChinese() {
-      showChinese = !showChinese;
-      renderCurrent();
-    }
-
-    function checkKeywords() {
-      if (!filteredCards.length || currentMode() !== 'keyword') return;
-      const card = getCurrentCard();
-      const keywordInputEl = document.getElementById('keywordInput');
-      const keywordFeedbackEl = document.getElementById('keywordFeedback');
-      const expected = (card.keywords || []).map(k => k.toLowerCase());
-      const input = keywordInputEl.value.toLowerCase();
-
-      if (expected.length === 0) {
-        keywordFeedbackEl.textContent = 'This card has no keyword list yet.';
-        keywordFeedbackEl.className = 'feedback bad';
-        return;
-      }
-
-      const missing = expected.filter(k => !input.includes(k));
-      if (missing.length === 0) {
-        keywordFeedbackEl.textContent = 'Great! You included all expected keywords.';
-        keywordFeedbackEl.className = 'feedback ok';
-      } else {
-        keywordFeedbackEl.textContent = `Missing keyword(s): ${missing.join(', ')}`;
-        keywordFeedbackEl.className = 'feedback bad';
-      }
-    }
-
-    modeSelectEl.addEventListener('change', () => {
-      currentIndex = 0;
-      showBack = false;
-      renderCurrent();
-    });
+    modeSelectEl.addEventListener('change', () => { currentIndex = 0; showBack = false; renderCurrent(); });
     toggleAnswerBtn.addEventListener('click', toggleAnswer);
     toggleChineseBtn.addEventListener('click', toggleChinese);
     nextBtn.addEventListener('click', nextCard);
     prevBtn.addEventListener('click', previousCard);
 
     document.addEventListener('keydown', (event) => {
-      const target = event.target;
-      const typing = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA');
-
-      if ((event.key === 'c' || event.key === 'C') && !typing) {
-        event.preventDefault();
-        toggleChinese();
-      } else if (event.key === ' ' && !typing) {
-        event.preventDefault();
-        toggleAnswer();
-      } else if (event.key === 'ArrowRight' && !typing) {
-        event.preventDefault();
-        nextCard();
-      } else if (event.key === 'ArrowLeft' && !typing) {
-        event.preventDefault();
-        previousCard();
-      }
+      const target = event.target; const typing = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA');
+      if ((event.key === 'c' || event.key === 'C') && !typing) { event.preventDefault(); toggleChinese(); }
+      else if (event.key === ' ' && !typing) { event.preventDefault(); toggleAnswer(); }
+      else if (event.key === 'ArrowRight' && !typing) { event.preventDefault(); nextCard(); }
+      else if (event.key === 'ArrowLeft' && !typing) { event.preventDefault(); previousCard(); }
     });
 
     loadCards();

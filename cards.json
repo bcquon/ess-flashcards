@@ -1258,9 +1258,9 @@
     "level": "SL",
     "category": "concept",
     "front": "3 Direct Human Threats to Biodiversity",
-    "back": "Habitat destruction; overexploitation; pollution.",
+    "back": "Overharvesting; poaching; illegal pet trade.",
     "front_zh": "对生物多样性的三种直接人类威胁",
-    "back_zh": "栖息地破坏；过度开发；污染。",
+    "back_zh": "过度捕捞或直接捕捞；偷猎；非法宠物贸易。",
     "keywords": ["direct threats", "3 threats"],
     "image": ""
   },
@@ -1270,9 +1270,9 @@
     "level": "SL",
     "category": "concept",
     "front": "Indirect Human Threats to Biodiversity",
-    "back": "Human population growth; economic development; climate change.",
+    "back": "Habitat loss and fragmentation; climate change; pollution; invasive alien species.",
     "front_zh": "对生物多样性的间接人类威胁",
-    "back_zh": "人口增长；经济发展；气候变化。",
+    "back_zh": "栖息地丧失和破碎化；气候变化；污染；外来入侵物种。",
     "keywords": ["indirect threats", "human causes"],
     "image": ""
   },
@@ -1330,12 +1330,12 @@
     "level": "SL",
     "category": "concept",
     "front": "Climate Change Impacts on Biodiversity",
-    "back": "Climate change can reduce biodiversity by changing habitats, temperatures, rainfall patterns, and food webs. Some species may not adapt or move fast enough, so populations may fall or disappear from some areas.",
+    "back": "Climate change affects biodiversity by shifting species ranges, changing the timing of biological events, increasing the frequency and intensity of extreme weather, and causing ocean acidification.",
     "front_zh": "气候变化对生物多样性的影响",
-    "back_zh": "气候变化会通过改变栖息地、温度、降雨模式和食物网来减少生物多样性。有些物种不能足够快地适应或迁移，所以它们的种群可能下降，或者从某些地区消失。",
-    "keywords": ["climate change", "biodiversity loss"],
+    "back_zh": "气候变化会通过改变物种分布范围、改变生物事件发生的时间、增加极端天气的频率和强度，以及造成海洋酸化来影响生物多样性。",
+    "keywords": ["climate change", "biodiversity impacts"],
     "image": ""
-  },
+  }
   {
     "id": "u3-concept-examples-of-tragedy-of-the-commons-sl",
     "unit": "Unit 3",

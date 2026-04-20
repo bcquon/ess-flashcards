@@ -93,7 +93,7 @@
     "front_zh": "价值观",
     "back_zh": "我们认为在生活中有价值、很重要的原则或品质（例如：勇气、诚实、同理心）。这些是构成一种视角的‘基本组成部分’。",
     "keywords": ["Principles"],
-    "image": ""
+    "image": "values.png"
   },
   {
     "id": "u1-vocab-worldviews-sl",
@@ -141,7 +141,7 @@
     "front_zh": "临界点",
     "back_zh": "一个系统变化太大，以至于无法轻易回到原来状态的点。",
     "keywords": ["critical point"],
-    "image": ""
+    "image": "tippingpoint.png"
   },
   {
     "id": "u1-vocab-positive-feedback-sl",
@@ -273,7 +273,7 @@
     "front_zh": "雏菊世界模型",
     "back_zh": "James Lovelock 和 Andrew Watson 的“雏菊世界”模型是为了解释行星的温度如何受生命调节而创建的。它展示了一个负反馈系统，并表明地球处于一种稳态平衡状态。",
     "keywords": ["negative feedback", "steady-state"],
-    "image": ""
+    "image": "daisyworld.png"
   },
   {
     "id": "u1-concept-factors-affecting-ecosystem-resilience-sl",
@@ -357,7 +357,7 @@
     "front_zh": "社会可持续性的例子",
     "back_zh": "社会可持续性的例子包括医疗系统、教育、公平、强大的社区，以及保护文化、语言、信仰或精神实践。",
     "keywords": ["equity", "community"],
-    "image": ""
+    "image": "threepillars.png"
   },
   {
     "id": "u1-concept-uses-of-sdgs-sl",
@@ -405,7 +405,7 @@
     "front_zh": "经济可持续性的例子",
     "back_zh": "经济可持续性的例子包括建立支持商品和服务生产与消费的经济系统、满足未来人类需求，以及维持经济稳定。",
     "keywords": ["production", "stability"],
-    "image": ""
+    "image": "threepillars.png"
   },
   {
     "id": "u1-vocab-static-equilibrium-sl",
@@ -417,7 +417,7 @@
     "front_zh": "静态平衡",
     "back_zh": "随着时间推移没有变化。",
     "keywords": ["no change"],
-    "image": ""
+    "image": "static.png"
   },
   {
     "id": "u1-vocab-steady-state-equilibrium-sl",
@@ -429,7 +429,7 @@
     "front_zh": "稳态平衡",
     "back_zh": "开放系统的状态长期不会改变，但短期可能会改变。",
     "keywords": ["long term", "short term"],
-    "image": ""
+    "image": "steady.png"
   },
   {
     "id": "u1-vocab-stable-equilibrium-sl",
@@ -441,7 +441,8 @@
     "front_zh": "稳定平衡",
     "back_zh": "受到干扰后能够恢复到原来平衡状态的系统。",
     "keywords": ["returns"],
-    "image": ""
+    "image": "stableunstable.png",
+	"image2": "stableunstable2.png"
   },
   {
     "id": "u1-vocab-unstable-equilibrium-sl",
@@ -453,7 +454,8 @@
     "front_zh": "不稳定平衡",
     "back_zh": "受到干扰后不能恢复到原来平衡状态的系统。",
     "keywords": ["does not return"],
-    "image": ""
+    "image": "stableunstable.png",
+	"image2": "stableunstable2.png"
   },
   {
     "id": "u1-vocab-homeostasis-sl",
@@ -477,7 +479,7 @@
     "front_zh": "雏菊世界模型",
     "back_zh": "James Lovelock 和 Andrew Watson 的“雏菊世界”模型是为了解释行星的温度如何受生命调节而创建的。",
     "keywords": ["temperature", "life"],
-    "image": ""
+    "image": "daisyworld.png"
   },
   {
     "id": "u1-vocab-emergent-properties-sl",
@@ -525,7 +527,7 @@
     "front_zh": "视角的发展",
     "back_zh": "视角是由许多因素发展和形成的。这些因素包括社会文化规范、科学理解、法律、宗教、经济状况、地方事件、全球事件以及生活经验。这些因素可以解释为什么人们会以不同方式看待和理解问题。视角并不是固定不变的。支撑视角的信念会在所有社会中随着时间而改变。它们可能因为政府宣传活动、非政府组织（NGO）活动、社会变化和人口变化而发生改变。这意味着，随着社会、知识和经验的变化，个人或群体的视角也会发展。",
     "keywords": ["influences", "change over time"],
-    "image": ""
+    "image": "devofperspectives.png"
   },
   {
     "id": "u1-concept-interpreting-behavior-time-graphs-sl",
@@ -729,7 +731,7 @@
     "front_zh": "生态足迹",
     "back_zh": "生态足迹是指提供一个人或一个人口所使用资源所需要的土地和水域面积。它表示维持这种生活方式需要多少自然资源，通常按每年来计算。",
     "keywords": ["resources used"],
-    "image": ""
+    "image": "footprint.png"
   },
   {
     "id": "u1-vocab-biocapacity-sl",
@@ -741,6 +743,42 @@
     "front_zh": "生物承载力",
     "back_zh": "生物承载力是指一个地区内生态系统生产有用生物资源的能力。它表示这个地区有多少自然资源可以支持生命，通常按每年来计算。",
     "keywords": ["produce", "resources"],
+    "image": "footprint.png"
+  },
+  {
+    "id": "u1-concept-components-of-ecological-footprint-biocapacity-sl",
+    "unit": "Unit 1",
+    "level": "SL",
+    "category": "concept",
+    "front": "Components of Ecological Footprint/Biocapacity",
+    "back": "Ecological footprint and biocapacity are both based on biologically productive land and water. The main components are cropland (land for growing crops), grazing land (land for raising animals), fishing grounds (water ecosystems that provide fish), forest land (land that provides forest products), and built-up land (land covered by buildings and infrastructure). Ecological footprint also includes a carbon footprint component, which is the forest area needed to absorb carbon dioxide emissions. Biocapacity does not include carbon in the same way, because fossil carbon is released on a geological timescale and cannot simply be regenerated quickly by ecosystems. In general, as countries develop, ecological footprint usually grows because people use more energy, goods, transport, land, and resources.",
+    "front_zh": "生态足迹／生物承载力的组成部分",
+    "back_zh": "生态足迹和生物承载力都基于具有生物生产力的土地和水域。主要组成部分包括：耕地（种植作物的土地）、牧场（饲养动物的土地）、渔场（提供鱼类的水域生态系统）、林地（提供森林产品的土地）以及建设用地（被建筑和基础设施覆盖的土地）。生态足迹还包括碳足迹成分，也就是吸收二氧化碳排放所需要的森林面积。生物承载力并不会以同样方式把碳算进去，因为化石碳是在地质时间尺度上释放的，生态系统不能快速把它重新恢复。一般来说，随着国家发展，生态足迹通常会上升，因为人们会使用更多能源、商品、交通、土地和资源。",
+    "keywords": ["components", "carbon"],
+    "image": ""
+  },
+  {
+    "id": "u1-concept-ecological-footprint-and-sustainability-sl",
+    "unit": "Unit 1",
+    "level": "SL",
+    "category": "concept",
+    "front": "Ecological Footprint and Sustainability",
+    "back": "Ecological footprint helps us judge sustainability by comparing what people demand from nature with what nature can regenerate. If ecological footprint is greater than biocapacity, the system is unsustainable because people are using resources and producing waste faster than ecosystems can recover. If ecological footprint is equal to biocapacity, this is roughly sustainable because demand matches the ecosystem’s ability to regenerate. If ecological footprint is less than biocapacity, this is sustainable because ecosystems can keep meeting demand over time. In very simple terms, ecological footprint is the natural resources we need and use, while biocapacity is the natural resources we have.",
+    "front_zh": "生态足迹与可持续性",
+    "back_zh": "生态足迹可以通过比较人类对自然的需求与自然能够再生的能力来判断是否可持续。如果生态足迹大于生物承载力，这就是不可持续的，因为人类使用资源和产生废物的速度超过了生态系统恢复的速度。如果生态足迹等于生物承载力，这大致是可持续的，因为需求与生态系统的再生能力相匹配。如果生态足迹小于生物承载力，这就是可持续的，因为生态系统能够长期持续满足需求。用最简单的话说，生态足迹是我们需要和使用的自然资源，而生物承载力是我们拥有的自然资源。",
+    "keywords": ["EF vs BC", "sustainability"],
+    "image": ""
+  },
+  {
+    "id": "u1-concept-sustainability-indicators-sl",
+    "unit": "Unit 1",
+    "level": "SL",
+    "category": "concept",
+    "front": "Sustainability Indicators",
+    "back": "Sustainability indicators are tools we use to decide whether something is sustainable. They help measure environmental, social, or economic conditions and show whether we are staying within sustainable limits. Examples include ecological footprint, natural income or natural resources, the three pillars of sustainability, donut economics, planetary boundaries, carbon footprint, water footprint, and circular economy. Different indicators focus on different parts of sustainability, so we usually need more than one indicator to get a fuller picture.",
+    "front_zh": "可持续性指标",
+    "back_zh": "可持续性指标是我们用来判断某件事是否可持续的工具。它们帮助我们衡量环境、社会或经济状况，并显示我们是否仍处于可持续的范围内。例子包括生态足迹、自然收入或自然资源、可持续发展的三大支柱、甜甜圈经济、行星边界、碳足迹、水足迹和循环经济。不同指标关注可持续性的不同部分，所以我们通常需要多个指标才能得到更完整的图景。",
+    "keywords": ["tools", "measure"],
     "image": ""
   },
   {

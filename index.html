@@ -6,62 +6,90 @@
   <title>IB ESS Study Platform</title>
   <style>
     :root {
-      --bg: #eef2ff;
-      --card: #ffffff;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --line: #d7ddea;
+      --bg-1: #eef4ff;
+      --bg-2: #f8fbff;
+      --panel: rgba(255, 255, 255, 0.78);
+      --panel-strong: #ffffff;
+      --text: #18212f;
+      --muted: #64748b;
+      --line: rgba(148, 163, 184, 0.28);
       --accent: #2563eb;
+      --accent-2: #1d4ed8;
+      --accent-soft: rgba(37, 99, 235, 0.12);
       --success: #0f766e;
       --error: #b91c1c;
       --keyword: #fef08a;
+      --shadow: 0 18px 50px rgba(15, 23, 42, 0.10);
+      --radius: 20px;
     }
 
     * { box-sizing: border-box; }
 
+    html, body {
+      min-height: 100%;
+    }
+
     body {
       margin: 0;
       font-family: Inter, "Segoe UI", Arial, sans-serif;
-      background: var(--bg);
       color: var(--text);
-      padding: 16px;
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 32%),
+        radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 28%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      padding: 24px 16px 40px;
     }
 
     .container {
-      max-width: 980px;
+      width: min(1100px, 100%);
       margin: 0 auto;
+      min-height: calc(100vh - 64px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 18px;
     }
 
-    h1 { margin: 0 0 4px; }
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 4vw, 36px);
+      text-align: center;
+      letter-spacing: -0.03em;
+    }
 
     .muted {
       color: var(--muted);
       margin: 0;
-      line-height: 1.4;
+      line-height: 1.5;
+      text-align: center;
     }
 
     .panel {
-      background: var(--card);
+      width: min(1000px, 100%);
+      background: var(--panel);
       border: 1px solid var(--line);
-      border-radius: 12px;
-      padding: 14px;
-      margin-top: 12px;
-      box-shadow: 0 10px 22px rgba(37, 99, 235, 0.06);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
     }
 
     .filters {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 14px;
+      gap: 16px;
+      align-items: start;
     }
 
     .group-title {
-      margin: 0 0 8px;
+      margin: 0 0 10px;
       font-size: 12px;
-      font-weight: 700;
+      font-weight: 800;
       color: var(--muted);
       text-transform: uppercase;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.08em;
     }
 
     .check-list {
@@ -70,50 +98,156 @@
       gap: 8px;
     }
 
-    label {
+    label.filter-chip {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 8px;
       font-size: 14px;
       cursor: pointer;
       border: 1px solid var(--line);
       border-radius: 999px;
-      padding: 5px 10px;
-      background: #f8faff;
+      padding: 7px 12px;
+      background: rgba(255,255,255,0.92);
+      transition: 0.18s ease;
+      user-select: none;
+    }
+
+    label.filter-chip:hover {
+      transform: translateY(-1px);
+      border-color: rgba(37, 99, 235, 0.25);
+      box-shadow: 0 8px 20px rgba(37, 99, 235, 0.08);
+    }
+
+    .controls-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
     }
 
     .controls {
       display: flex;
-      gap: 8px;
+      gap: 10px;
       flex-wrap: wrap;
       align-items: center;
-      margin-top: 8px;
+      justify-content: center;
     }
 
     button,
     select,
     input[type="text"] {
       border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 8px 10px;
+      border-radius: 14px;
+      padding: 10px 14px;
       font-size: 14px;
-      background: #fff;
+      background: rgba(255,255,255,0.98);
+      color: var(--text);
+      transition: 0.18s ease;
     }
 
     button { cursor: pointer; }
 
-    .primary {
-      background: var(--accent);
-      color: #fff;
-      border-color: var(--accent);
+    button:hover,
+    select:hover,
+    input[type="text"]:hover {
+      border-color: rgba(37, 99, 235, 0.28);
     }
 
-    .card {
-      min-height: 340px;
+    button:focus-visible,
+    select:focus-visible,
+    input[type="text"]:focus-visible,
+    .flashcard-shell:focus-visible,
+    .nav-arrow:focus-visible {
+      outline: 3px solid rgba(37, 99, 235, 0.22);
+      outline-offset: 2px;
+    }
+
+    .primary {
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+    }
+
+    .primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.28);
+    }
+
+    .mode-bottom {
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .study-stage {
+      width: min(1000px, 100%);
+      display: grid;
+      grid-template-columns: 88px minmax(0, 1fr) 88px;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .nav-arrow {
+      width: 72px;
+      height: 72px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.88);
+      font-size: 34px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: var(--shadow);
+      transition: 0.18s ease;
+    }
+
+    .nav-arrow:hover {
+      transform: translateY(-2px) scale(1.02);
+      background: white;
+    }
+
+    .flashcard-shell {
+      width: 100%;
+      min-height: 520px;
+      background: transparent;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+      perspective: 1400px;
+    }
+
+    .flashcard-inner {
+      position: relative;
+      width: 100%;
+      min-height: 520px;
+      transition: transform 0.65s cubic-bezier(.2,.8,.2,1);
+      transform-style: preserve-3d;
+    }
+
+    .flashcard-shell.is-flipped .flashcard-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(248,250,252,0.95));
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 22px;
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      padding: 18px;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .card-face.back-face {
+      transform: rotateY(180deg);
     }
 
     .meta {
@@ -122,101 +256,186 @@
       display: flex;
       gap: 8px;
       flex-wrap: wrap;
+      justify-content: center;
+      min-height: 28px;
     }
 
     .pill {
       border: 1px solid var(--line);
       border-radius: 999px;
-      padding: 2px 10px;
-      background: #f9fafb;
+      padding: 4px 10px;
+      background: rgba(248, 250, 252, 0.95);
+      font-weight: 600;
+    }
+
+    .face-center {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 14px;
+      min-height: 0;
     }
 
     .front {
-      font-size: clamp(34px, 5vw, 54px);
-      font-weight: 700;
+      font-size: clamp(34px, 5vw, 56px);
+      font-weight: 800;
       line-height: 1.08;
-      margin-top: 8px;
-      letter-spacing: -0.02em;
-      max-width: 26ch;
+      letter-spacing: -0.03em;
+      max-width: 14ch;
+      text-wrap: balance;
+    }
+
+    .back-text {
+      font-size: clamp(20px, 2.1vw, 28px);
+      line-height: 1.55;
+      max-width: 28ch;
+      text-wrap: balance;
     }
 
     .zh {
       color: var(--muted);
-      font-size: 16px;
+      font-size: clamp(16px, 1.6vw, 20px);
+      max-width: 32ch;
+      text-wrap: balance;
     }
-
-    .back {
-      display: none;
-      font-size: 19px;
-      line-height: 1.6;
-      border-top: 1px solid var(--line);
-      padding-top: 12px;
-    }
-
-    .back.show { display: block; }
 
     mark {
       background: var(--keyword);
-      padding: 0 3px;
-      border-radius: 3px;
+      padding: 0 4px;
+      border-radius: 4px;
     }
 
     .card-image {
-      max-width: 100%;
-      max-height: 260px;
+      max-width: min(100%, 420px);
+      max-height: 220px;
       border: 1px solid var(--line);
-      border-radius: 8px;
+      border-radius: 16px;
       display: none;
       object-fit: contain;
       background: #fff;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
     }
 
     .card-image.show { display: block; }
 
+    .face-footer {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 36px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .panel-content {
+      width: 100%;
+      min-height: 520px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(248,250,252,0.95));
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 16px;
+    }
+
     .quiz-area {
       display: none;
-      margin-top: 4px;
-    }
-
-    .quiz-area.show { display: block; }
-
-    .choices {
-      display: grid;
-      gap: 8px;
-      margin-top: 8px;
-    }
-
-    .choice {
-      text-align: left;
       width: 100%;
     }
 
-    .feedback {
+    .quiz-area.show {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .choices {
+      display: grid;
+      gap: 10px;
       margin-top: 10px;
+      width: min(700px, 100%);
+    }
+
+    .choice {
+      text-align: center;
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 16px;
+    }
+
+    .feedback {
+      margin-top: 12px;
       font-weight: 700;
+      min-height: 24px;
     }
 
     .ok { color: var(--success); }
     .bad { color: var(--error); }
 
     .status {
-      margin-top: auto;
-      font-size: 14px;
+      text-align: center;
       color: var(--muted);
+      font-size: 14px;
     }
 
-    .shortcuts {
-      margin-top: 8px;
-      font-size: 13px;
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      padding: 48px 16px;
     }
 
-    @media (max-width: 820px) {
+    @media (max-width: 920px) {
       .filters {
         grid-template-columns: 1fr;
       }
 
-      .card {
-        min-height: 280px;
+      .study-stage {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .nav-row-mobile {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+      }
+
+      .nav-arrow {
+        width: 64px;
+        height: 64px;
+      }
+
+      .flashcard-shell,
+      .flashcard-inner,
+      .panel-content {
+        min-height: 460px;
+      }
+    }
+
+    @media (max-width: 560px) {
+      body {
+        padding-inline: 12px;
+      }
+
+      .card-face,
+      .panel-content,
+      .panel {
+        padding: 16px;
+      }
+
+      .flashcard-shell,
+      .flashcard-inner,
+      .panel-content {
+        min-height: 420px;
       }
     }
   </style>
@@ -224,7 +443,7 @@
 <body>
   <div class="container">
     <h1>IB ESS Flashcards</h1>
-    <p class="muted">Choose filters, pick a mode, and study with study cards, multiple choice, or keyword quiz.</p>
+    <p class="muted">Choose filters, study with randomized cards, and flip the center card like a real flashcard.</p>
 
     <section class="panel filters">
       <div>
@@ -241,7 +460,7 @@
       </div>
     </section>
 
-    <section class="panel">
+    <section class="panel controls-wrap">
       <div class="controls">
         <label for="modeSelect">Mode:</label>
         <select id="modeSelect">
@@ -250,41 +469,25 @@
           <option value="keyword">Keyword mode</option>
         </select>
 
-        <button id="toggleAnswerBtn">Show answer (Space)</button>
-        <button id="nextBtn" class="primary">Next (→)</button>
+        <button id="toggleAnswerBtn">Flip card (Space)</button>
         <button id="toggleChineseBtn">Chinese: Off (C)</button>
       </div>
-      <p class="muted shortcuts">Shortcuts: <strong>C</strong> toggle Chinese, <strong>Space</strong> show/hide answer (study), <strong>→</strong> next card/question.</p>
+      <div class="mode-bottom">Shortcuts: <strong>Space</strong> flip card, <strong>←</strong> previous, <strong>→</strong> next, <strong>C</strong> toggle Chinese.</div>
     </section>
 
-    <section class="panel card">
-      <div class="meta" id="meta"></div>
-      <div class="front" id="front">Loading...</div>
-      <div class="zh" id="frontZh"></div>
-
-      <div id="studyArea" class="quiz-area show">
-        <div id="back" class="back"></div>
-        <div class="zh" id="backZh"></div>
+    <section class="study-stage">
+      <div class="nav-row-mobile">
+        <button id="prevBtn" class="nav-arrow" aria-label="Previous card">&#8592;</button>
       </div>
 
-      <div id="mcqArea" class="quiz-area">
-        <div id="mcqPrompt" style="font-size: 18px; line-height: 1.5;"></div>
-        <div id="choices" class="choices"></div>
-        <div id="mcqFeedback" class="feedback"></div>
-      </div>
+      <div id="cardStage"></div>
 
-      <div id="keywordArea" class="quiz-area">
-        <div id="keywordPrompt" style="font-size: 18px; line-height: 1.5;"></div>
-        <div class="controls" style="margin-top: 8px;">
-          <input type="text" id="keywordInput" placeholder="Type keyword(s)" style="flex: 1; min-width: 220px;" />
-          <button id="checkKeywordBtn">Check</button>
-        </div>
-        <div id="keywordFeedback" class="feedback"></div>
+      <div class="nav-row-mobile">
+        <button id="nextBtn" class="nav-arrow" aria-label="Next card">&#8594;</button>
       </div>
-
-      <img id="cardImage" class="card-image" alt="Card visual" />
-      <div class="status" id="status"></div>
     </section>
+
+    <div class="status" id="status"></div>
   </div>
 
   <script>
@@ -293,6 +496,7 @@
 
     let allCards = [];
     let filteredCards = [];
+    let studyOrder = [];
     let currentIndex = 0;
     let showChinese = false;
     let showBack = false;
@@ -304,28 +508,10 @@
     const modeSelectEl = document.getElementById('modeSelect');
     const toggleAnswerBtn = document.getElementById('toggleAnswerBtn');
     const toggleChineseBtn = document.getElementById('toggleChineseBtn');
+    const prevBtn = document.getElementById('prevBtn');
     const nextBtn = document.getElementById('nextBtn');
-
-    const metaEl = document.getElementById('meta');
-    const frontEl = document.getElementById('front');
-    const frontZhEl = document.getElementById('frontZh');
-    const backEl = document.getElementById('back');
-    const backZhEl = document.getElementById('backZh');
+    const cardStageEl = document.getElementById('cardStage');
     const statusEl = document.getElementById('status');
-    const cardImageEl = document.getElementById('cardImage');
-
-    const studyAreaEl = document.getElementById('studyArea');
-    const mcqAreaEl = document.getElementById('mcqArea');
-    const keywordAreaEl = document.getElementById('keywordArea');
-
-    const mcqPromptEl = document.getElementById('mcqPrompt');
-    const choicesEl = document.getElementById('choices');
-    const mcqFeedbackEl = document.getElementById('mcqFeedback');
-
-    const keywordPromptEl = document.getElementById('keywordPrompt');
-    const keywordInputEl = document.getElementById('keywordInput');
-    const checkKeywordBtn = document.getElementById('checkKeywordBtn');
-    const keywordFeedbackEl = document.getElementById('keywordFeedback');
 
     async function loadCards() {
       try {
@@ -338,8 +524,12 @@
 
         applyFilters();
       } catch (error) {
-        frontEl.textContent = 'Error loading cards.json';
-        statusEl.textContent = 'Make sure index.html and cards.json are in the same folder.';
+        cardStageEl.innerHTML = `
+          <div class="panel-content empty-state">
+            <div style="font-size: 28px; font-weight: 800; color: var(--text);">Error loading cards.json</div>
+            <div>Make sure index.html and cards.json are in the same folder.</div>
+          </div>
+        `;
       }
     }
 
@@ -352,6 +542,7 @@
       for (const value of values) {
         const id = `${container.id}-${String(value).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
         const label = document.createElement('label');
+        label.className = 'filter-chip';
         const input = document.createElement('input');
         input.type = 'checkbox';
         input.value = value;
@@ -366,7 +557,22 @@
     }
 
     function selectedValues(container) {
-      return Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map((el) => el.value);
+      return Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(el => el.value);
+    }
+
+    function shuffled(array) {
+      const copy = [...array];
+      for (let i = copy.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copy[i], copy[j]] = [copy[j], copy[i]];
+      }
+      return copy;
+    }
+
+    function rebuildStudyOrder() {
+      studyOrder = shuffled(filteredCards);
+      currentIndex = 0;
+      showBack = false;
     }
 
     function applyFilters() {
@@ -380,7 +586,7 @@
         categories.includes(card.category)
       );
 
-      currentIndex = 0;
+      rebuildStudyOrder();
       renderCurrent();
     }
 
@@ -388,13 +594,27 @@
       return modeSelectEl.value;
     }
 
+    function activeDeck() {
+      return currentMode() === 'study' ? studyOrder : filteredCards;
+    }
+
     function getCurrentCard() {
-      return filteredCards[currentIndex];
+      return activeDeck()[currentIndex];
+    }
+
+    function resetPositionIfNeeded() {
+      const deck = activeDeck();
+      if (!deck.length) {
+        currentIndex = 0;
+        return;
+      }
+      if (currentIndex >= deck.length) currentIndex = 0;
+      if (currentIndex < 0) currentIndex = deck.length - 1;
     }
 
     function escapeRegExp(text) {
-      return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    }
+	  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+	}
 
     function highlightKeywords(text, keywords = []) {
       if (!text || !keywords.length) return text;
@@ -409,40 +629,43 @@
     }
 
     function renderMeta(card) {
-      metaEl.innerHTML = '';
-      const tags = [card.unit, card.level, card.category];
-      for (const tag of tags) {
-        const el = document.createElement('span');
-        el.className = 'pill';
-        el.textContent = tag;
-        metaEl.appendChild(el);
-      }
+      return [card.unit, card.level, card.category]
+        .filter(Boolean)
+        .map(tag => `<span class="pill">${tag}</span>`)
+        .join('');
     }
 
     function renderStudy(card) {
-	  frontEl.textContent = card.front;
-	  frontZhEl.textContent = showChinese && card.front_zh ? card.front_zh : '';
-	  backEl.innerHTML = highlightKeywords(card.back, card.keywords);
-	  backZhEl.textContent = showChinese && card.back_zh && showBack ? card.back_zh : '';
-	  backEl.classList.toggle('show', showBack);
-	  toggleAnswerBtn.textContent = showBack ? 'Hide answer (Space)' : 'Show answer (Space)';
+      const frontZh = showChinese && card.front_zh ? `<div class="zh">${card.front_zh}</div>` : '';
+      const backZh = showChinese && card.back_zh ? `<div class="zh">${card.back_zh}</div>` : '';
+      const imageHtml = card.image ? `<img class="card-image${showBack ? ' show' : ''}" src="images/${card.image}" alt="Card visual" />` : '';
 
-	  if (showBack && card.image) {
-		cardImageEl.src = `images/${card.image}`;
-		cardImageEl.classList.add('show');
-	  } else {
-		cardImageEl.removeAttribute('src');
-		cardImageEl.classList.remove('show');
-	  }
-	}
+      cardStageEl.innerHTML = `
+        <button class="flashcard-shell ${showBack ? 'is-flipped' : ''}" id="flashcardShell" aria-label="Flip card">
+          <div class="flashcard-inner">
+            <div class="card-face front-face">
+              <div class="meta">${renderMeta(card)}</div>
+              <div class="face-center">
+                <div class="front">${card.front}</div>
+                ${frontZh}
+              </div>
+              <div class="face-footer">Click the card to flip</div>
+            </div>
+            <div class="card-face back-face">
+              <div class="meta">${renderMeta(card)}</div>
+              <div class="face-center">
+                <div class="back-text">${highlightKeywords(card.back, card.keywords)}</div>
+                ${backZh}
+                ${imageHtml}
+              </div>
+              <div class="face-footer">Click the card to flip back</div>
+            </div>
+          </div>
+        </button>
+      `;
 
-    function shuffled(array) {
-      const copy = [...array];
-      for (let i = copy.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [copy[i], copy[j]] = [copy[j], copy[i]];
-      }
-      return copy;
+      document.getElementById('flashcardShell').addEventListener('click', toggleAnswer);
+      toggleAnswerBtn.textContent = showBack ? 'Flip to front (Space)' : 'Flip card (Space)';
     }
 
     function buildMcqOptions(card) {
@@ -455,9 +678,7 @@
 
       const distractors = [];
       for (const candidate of pool) {
-        if (candidate !== correct && !distractors.includes(candidate)) {
-          distractors.push(candidate);
-        }
+        if (candidate !== correct && !distractors.includes(candidate)) distractors.push(candidate);
         if (distractors.length === 3) break;
       }
 
@@ -471,62 +692,75 @@
         ? `Choose the correct answer for: ${card.front}`
         : `Choose the matching front for: ${card.back}`;
 
-      frontEl.textContent = 'Multiple Choice';
-      frontZhEl.textContent = showChinese && card.front_zh ? `参考: ${card.front_zh}` : '';
-      mcqPromptEl.textContent = prompt;
-      choicesEl.innerHTML = '';
-      mcqFeedbackEl.textContent = '';
-      mcqFeedbackEl.className = 'feedback';
+      cardStageEl.innerHTML = `
+        <div class="panel-content">
+          <div class="meta">${renderMeta(card)}</div>
+          <div class="face-center" style="width: 100%;">
+            <div class="front" style="font-size: clamp(24px, 3vw, 34px); max-width: 18ch;">Multiple Choice</div>
+            ${showChinese && card.front_zh ? `<div class="zh">参考: ${card.front_zh}</div>` : ''}
+            <div style="font-size: clamp(18px, 2vw, 24px); line-height: 1.5; max-width: 32ch;">${prompt}</div>
+            <div class="choices" id="choices"></div>
+            <div class="feedback" id="mcqFeedback"></div>
+          </div>
+        </div>
+      `;
 
-      for (const option of options) {
+      const choicesEl = document.getElementById('choices');
+      const mcqFeedbackEl = document.getElementById('mcqFeedback');
+      options.forEach(option => {
         const btn = document.createElement('button');
         btn.className = 'choice';
         btn.textContent = option;
         btn.addEventListener('click', () => {
           const isCorrect = option === correct;
           mcqFeedbackEl.textContent = isCorrect ? 'Correct!' : 'Not quite.';
-          mcqFeedbackEl.classList.add(isCorrect ? 'ok' : 'bad');
+          mcqFeedbackEl.className = `feedback ${isCorrect ? 'ok' : 'bad'}`;
         });
         choicesEl.appendChild(btn);
-      }
-
-      cardImageEl.removeAttribute('src');
-      cardImageEl.classList.remove('show');
+      });
     }
 
     function renderKeyword(card) {
-      frontEl.textContent = 'Keyword Quiz';
-      frontZhEl.textContent = showChinese && card.front_zh ? `参考: ${card.front_zh}` : '';
-      keywordPromptEl.textContent = card.back;
-      keywordInputEl.value = '';
-      keywordFeedbackEl.textContent = '';
-      keywordFeedbackEl.className = 'feedback';
-      cardImageEl.removeAttribute('src');
-	  cardImageEl.classList.remove('show');
+      cardStageEl.innerHTML = `
+        <div class="panel-content">
+          <div class="meta">${renderMeta(card)}</div>
+          <div class="face-center" style="width: 100%;">
+            <div class="front" style="font-size: clamp(24px, 3vw, 34px); max-width: 18ch;">Keyword Quiz</div>
+            ${showChinese && card.front_zh ? `<div class="zh">参考: ${card.front_zh}</div>` : ''}
+            <div style="font-size: clamp(18px, 2vw, 24px); line-height: 1.5; max-width: 32ch;">${card.back}</div>
+            <div class="controls" style="margin-top: 4px; width: min(720px, 100%);">
+              <input type="text" id="keywordInput" placeholder="Type keyword(s)" style="flex: 1; min-width: 220px;" />
+              <button id="checkKeywordBtn" class="primary">Check</button>
+            </div>
+            <div class="feedback" id="keywordFeedback"></div>
+          </div>
+        </div>
+      `;
+
+      const keywordInputEl = document.getElementById('keywordInput');
+      const checkKeywordBtn = document.getElementById('checkKeywordBtn');
+      checkKeywordBtn.addEventListener('click', checkKeywords);
+      keywordInputEl.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') checkKeywords();
+      });
     }
 
-    function renderCurrent(resetBack = true) {
-      if (filteredCards.length === 0) {
-        metaEl.innerHTML = '';
-        frontEl.textContent = 'No cards match current filters.';
-        frontZhEl.textContent = '';
-        backEl.textContent = '';
-        backZhEl.textContent = '';
-        cardImageEl.classList.remove('show');
-        statusEl.textContent = 'Try selecting more units, levels, or categories.';
+    function renderCurrent() {
+      resetPositionIfNeeded();
+      const deck = activeDeck();
+
+      if (!deck.length) {
+        cardStageEl.innerHTML = `
+          <div class="panel-content empty-state">
+            <div style="font-size: 28px; font-weight: 800; color: var(--text);">No cards match current filters.</div>
+            <div>Try selecting more units, levels, or categories.</div>
+          </div>
+        `;
+        statusEl.textContent = 'No cards available';
         return;
       }
 
       const card = getCurrentCard();
-      if (resetBack) {
-        showBack = false;
-      }
-      renderMeta(card);
-
-      studyAreaEl.classList.toggle('show', currentMode() === 'study');
-      mcqAreaEl.classList.toggle('show', currentMode() === 'mcq');
-      keywordAreaEl.classList.toggle('show', currentMode() === 'keyword');
-
       if (currentMode() === 'study') {
         renderStudy(card);
       } else if (currentMode() === 'mcq') {
@@ -535,65 +769,77 @@
         renderKeyword(card);
       }
 
-      toggleAnswerBtn.disabled = currentMode() !== 'study';
-      statusEl.textContent = `Card ${currentIndex + 1} of ${filteredCards.length}`;
+      statusEl.textContent = `Card ${currentIndex + 1} of ${deck.length}${currentMode() === 'study' ? ' • randomized order' : ''}`;
       toggleChineseBtn.textContent = `Chinese: ${showChinese ? 'On' : 'Off'} (C)`;
+      toggleAnswerBtn.disabled = currentMode() !== 'study';
     }
 
     function toggleAnswer() {
-      if (currentMode() !== 'study' || filteredCards.length === 0) return;
+      if (currentMode() !== 'study' || !activeDeck().length) return;
       showBack = !showBack;
-      const card = getCurrentCard();
-      renderStudy(card);
+      renderCurrent();
     }
 
     function nextCard() {
-      if (filteredCards.length === 0) return;
-      currentIndex = (currentIndex + 1) % filteredCards.length;
+      const deck = activeDeck();
+      if (!deck.length) return;
+      currentIndex = (currentIndex + 1) % deck.length;
+      showBack = false;
+      renderCurrent();
+    }
+
+    function previousCard() {
+      const deck = activeDeck();
+      if (!deck.length) return;
+      currentIndex = (currentIndex - 1 + deck.length) % deck.length;
+      showBack = false;
       renderCurrent();
     }
 
     function toggleChinese() {
       showChinese = !showChinese;
-      renderCurrent(false);
+      renderCurrent();
     }
 
     function checkKeywords() {
-      if (filteredCards.length === 0 || currentMode() !== 'keyword') return;
+      if (!filteredCards.length || currentMode() !== 'keyword') return;
       const card = getCurrentCard();
+      const keywordInputEl = document.getElementById('keywordInput');
+      const keywordFeedbackEl = document.getElementById('keywordFeedback');
       const expected = (card.keywords || []).map(k => k.toLowerCase());
       const input = keywordInputEl.value.toLowerCase();
 
       if (expected.length === 0) {
         keywordFeedbackEl.textContent = 'This card has no keyword list yet.';
-        keywordFeedbackEl.classList.add('bad');
+        keywordFeedbackEl.className = 'feedback bad';
         return;
       }
 
       const missing = expected.filter(k => !input.includes(k));
       if (missing.length === 0) {
         keywordFeedbackEl.textContent = 'Great! You included all expected keywords.';
-        keywordFeedbackEl.classList.add('ok');
+        keywordFeedbackEl.className = 'feedback ok';
       } else {
         keywordFeedbackEl.textContent = `Missing keyword(s): ${missing.join(', ')}`;
-        keywordFeedbackEl.classList.add('bad');
+        keywordFeedbackEl.className = 'feedback bad';
       }
     }
 
-    modeSelectEl.addEventListener('change', renderCurrent);
+    modeSelectEl.addEventListener('change', () => {
+      currentIndex = 0;
+      showBack = false;
+      renderCurrent();
+    });
     toggleAnswerBtn.addEventListener('click', toggleAnswer);
     toggleChineseBtn.addEventListener('click', toggleChinese);
     nextBtn.addEventListener('click', nextCard);
-    checkKeywordBtn.addEventListener('click', checkKeywords);
-    keywordInputEl.addEventListener('keydown', (event) => {
-      if (event.key === 'Enter') checkKeywords();
-    });
+    prevBtn.addEventListener('click', previousCard);
 
     document.addEventListener('keydown', (event) => {
       const target = event.target;
       const typing = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA');
 
-      if (event.key === 'c' || event.key === 'C') {
+      if ((event.key === 'c' || event.key === 'C') && !typing) {
         event.preventDefault();
         toggleChinese();
       } else if (event.key === ' ' && !typing) {
@@ -602,6 +848,9 @@
       } else if (event.key === 'ArrowRight' && !typing) {
         event.preventDefault();
         nextCard();
+      } else if (event.key === 'ArrowLeft' && !typing) {
+        event.preventDefault();
+        previousCard();
       }
     });
 

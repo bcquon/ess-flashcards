@@ -236,7 +236,7 @@
       border: 1px solid var(--line);
       border-radius: 28px;
       box-shadow: var(--shadow);
-      padding: 24px 12px; /* Changed: Less padding on the sides */
+      padding: 24px 12px; 
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -295,15 +295,15 @@
       font-size: clamp(28px, 4vw, 42px);
       font-weight: 800;
       line-height: 1.1;
-      max-width: 95%; /* Changed: Fills most of the box now */
+      max-width: 95%; 
       text-wrap: balance;
       margin: 0 auto; 
     }
 
     .back-text {
       font-size: clamp(18px, 2vw, 24px);
-      line-height: 1.35; /* Changed: Tighter line spacing */
-      max-width: 95%; /* Changed: Fills most of the box now */
+      line-height: 1.35; 
+      max-width: 95%; 
       text-wrap: balance;
       margin: 0 auto; 
     }
@@ -311,8 +311,8 @@
     .zh {
       color: var(--muted);
       font-size: clamp(15px, 1.5vw, 18px);
-      line-height: 1.4; /* Changed: Tighter line spacing */
-      max-width: 95%; /* Changed: Fills most of the box now */
+      line-height: 1.4; 
+      max-width: 95%; 
       text-wrap: balance;
       margin: 0 auto; 
     }
@@ -323,14 +323,12 @@
       max-height: 280px; 
       border: 1px solid var(--line);
       border-radius: 12px;
-      /* display: none;  <--- DELETED! */
       object-fit: contain; 
       background: #fff;
       box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
       margin: 0 auto; 
     }
 
-    /* Add this right below to auto-hide empty images if a card has no picture */
     .card-image[src=""], .card-image:not([src]) {
       display: none;
     }
@@ -479,6 +477,7 @@
         <label for="modeSelect">Mode:</label>
         <select id="modeSelect">
           <option value="study">Study mode</option>
+          <option value="reverse">Reverse mode (Def first)</option>
           <option value="mcq">Multiple choice mode</option>
           <option value="keyword" disabled>Keyword mode (coming soon)</option>
         </select>
@@ -521,7 +520,6 @@
     const cardStageEl = document.getElementById('cardStage');
     const statusEl = document.getElementById('status');
 
-    // --- NEW: LOCAL STORAGE SNAPSHOT FUNCTIONS ---
     function saveState() {
       const state = {
         units: selectedValues(unitFiltersEl),
@@ -530,7 +528,7 @@
         mode: modeSelectEl.value,
         showChinese: showChinese,
         currentIndex: currentIndex,
-        studyOrderIds: studyOrder.map(c => c.id) // Saves the randomized order!
+        studyOrderIds: studyOrder.map(c => c.id) 
       };
       localStorage.setItem('essFlashcardsState', JSON.stringify(state));
     }
@@ -547,27 +545,24 @@
       for (const id of savedIds) {
         if (filteredMap.has(id)) {
           restored.push(filteredMap.get(id));
-          filteredMap.delete(id); // Remove so we don't duplicate
+          filteredMap.delete(id); 
         }
       }
-      // If you added new cards to JSON since the last save, shuffle them in at the end
       const remaining = Array.from(filteredMap.values());
       if (remaining.length > 0) restored.push(...shuffled(remaining));
       studyOrder = restored;
     }
-    // ---------------------------------------------
 
     async function loadCards() {
       try {
         const response = await fetch('cards.json');
         allCards = await response.json();
         
-        // Build checkboxes with default values first
-        buildCheckboxGroup(unitFiltersEl, uniqueValues(allCards, 'unit'), true);
-        buildCheckboxGroup(levelFiltersEl, DEFAULT_LEVELS, true);
-        buildCheckboxGroup(categoryFiltersEl, DEFAULT_CATEGORIES, true);
+        // Use the callback method in buildCheckboxGroup to dictate default checked state
+        buildCheckboxGroup(unitFiltersEl, uniqueValues(allCards, 'unit'), (val) => val !== 'Test Prep');
+        buildCheckboxGroup(levelFiltersEl, ['SL', 'HL'], (val) => val !== 'HL');
+        buildCheckboxGroup(categoryFiltersEl, DEFAULT_CATEGORIES, () => true);
 
-        // Check if we have a saved snapshot
         const saved = localStorage.getItem('essFlashcardsState');
         let loadedState = null;
         if (saved) {
@@ -575,18 +570,15 @@
         }
 
         if (loadedState) {
-          // 1. Restore the UI settings
           if (loadedState.mode) modeSelectEl.value = loadedState.mode;
           showChinese = !!loadedState.showChinese;
           if (loadedState.units) setCheckboxes(unitFiltersEl, loadedState.units);
           if (loadedState.levels) setCheckboxes(levelFiltersEl, loadedState.levels);
           if (loadedState.categories) setCheckboxes(categoryFiltersEl, loadedState.categories);
 
-          // 2. Filter the cards based on those saved settings
           const units = selectedValues(unitFiltersEl); const levels = selectedValues(levelFiltersEl); const categories = selectedValues(categoryFiltersEl);
           filteredCards = allCards.filter(card => units.includes(card.unit) && levels.includes(card.level) && categories.includes(card.category));
 
-          // 3. Restore the exact randomized order and the card index
           if (loadedState.studyOrderIds) restoreStudyOrder(loadedState.studyOrderIds);
           else rebuildStudyOrder();
           
@@ -594,7 +586,6 @@
           resetPositionIfNeeded();
           renderCurrent();
         } else {
-          // If no save exists, run a fresh start
           applyFilters();
         }
       } catch (error) {
@@ -602,13 +593,30 @@
       }
     }
 
-    function uniqueValues(cards, field) { return [...new Set(cards.map(card => card[field]).filter(Boolean))].sort(); }
-    function buildCheckboxGroup(container, values, checked) {
+    // Custom sorting specifically applied to the 'unit' field
+    function uniqueValues(cards, field) { 
+      const vals = [...new Set(cards.map(card => card[field]).filter(Boolean))].sort(); 
+      if (field === 'unit') {
+        return vals.sort((a, b) => {
+          if (a === 'Test Prep') return 1;
+          if (b === 'Test Prep') return -1;
+          return a.localeCompare(b);
+        });
+      }
+      return vals;
+    }
+
+    // Updated to accept a callback function for the checked state
+    function buildCheckboxGroup(container, values, checkedConfig) {
       container.innerHTML = '';
       for (const value of values) {
         const id = `${container.id}-${String(value).toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
         const label = document.createElement('label'); label.className = 'filter-chip';
-        const input = document.createElement('input'); input.type = 'checkbox'; input.value = value; input.checked = checked; input.id = id;
+        const input = document.createElement('input'); input.type = 'checkbox'; input.value = value; 
+        
+        input.checked = typeof checkedConfig === 'function' ? checkedConfig(value) : checkedConfig;
+        
+        input.id = id;
         input.addEventListener('change', applyFilters); label.htmlFor = id; label.appendChild(input); label.append(document.createTextNode(value));
         container.appendChild(label);
       }
@@ -625,7 +633,7 @@
     }
 
     function currentMode() { return modeSelectEl.value; }
-    function activeDeck() { return currentMode() === 'study' ? studyOrder : filteredCards; }
+    function activeDeck() { return (currentMode() === 'study' || currentMode() === 'reverse') ? studyOrder : filteredCards; }
     function getCurrentCard() { return activeDeck()[currentIndex]; }
 
     function resetPositionIfNeeded() {
@@ -638,9 +646,18 @@
     function renderMeta(card) { return [card.unit, card.level, card.category].filter(Boolean).map(tag => `<span class="pill">${tag}</span>`).join(''); }
 
     function renderStudy(card) {
-      const frontZh = showChinese && card.front_zh ? `<div class="zh">${card.front_zh}</div>` : '';
-      const backZh = showChinese && card.back_zh ? `<div class="zh">${card.back_zh}</div>` : '';
+      const isReverse = currentMode() === 'reverse';
+
+      // Dynamically assign front/back content based on mode
+      const frontText = isReverse ? card.back : card.front;
+      const backText = isReverse ? card.front : card.back;
+      
+      const frontZh = showChinese && (isReverse ? card.back_zh : card.front_zh) ? `<div class="zh">${isReverse ? card.back_zh : card.front_zh}</div>` : '';
+      const backZh = showChinese && (isReverse ? card.front_zh : card.back_zh) ? `<div class="zh">${isReverse ? card.front_zh : card.back_zh}</div>` : '';
+      
       const imageHtml = card.image ? `<img class="card-image" src="images/${card.image}" alt="Card visual" />` : '';
+      const frontImage = isReverse ? imageHtml : '';
+      const backImage = isReverse ? '' : imageHtml;
 
       cardStageEl.innerHTML = `
         <button class="flashcard-shell" id="flashcardShell" aria-label="Flip card">
@@ -648,17 +665,18 @@
             <div class="card-face front-face">
               <div class="meta">${renderMeta(card)}</div>
               <div class="face-center">
-                <div class="front">${card.front}</div>
+                <div class="${isReverse ? 'back-text' : 'front'}">${frontText}</div>
                 ${frontZh}
+                ${frontImage}
               </div>
               <div class="face-footer">Click the card to flip</div>
             </div>
             <div class="card-face back-face">
               <div class="meta">${renderMeta(card)}</div>
               <div class="face-center">
-                <div class="back-text">${card.back}</div>
+                <div class="${isReverse ? 'front' : 'back-text'}">${backText}</div>
                 ${backZh}
-                ${imageHtml}
+                ${backImage}
               </div>
               <div class="face-footer">Click the card to flip back</div>
             </div>
@@ -682,7 +700,7 @@
 
     function renderMcq(card) {
       const { direction, correct, options } = buildMcqOptions(card);
-      const prompt = direction === 'front-to-back' ? `Choose the correct answer for: ${card.front}` : `Choose the matching front for: ${card.back}`;
+      const prompt = direction === 'front-to-back' ? `Choose the correct answer for: ${card.front}` : `Choose the matching term for: ${card.back}`;
       cardStageEl.innerHTML = `
         <div class="panel-content">
           <div class="meta">${renderMeta(card)}</div>
@@ -711,20 +729,22 @@
       if (!deck.length) { 
         cardStageEl.innerHTML = `<div class="panel-content empty-state"><div>No cards match current filters.</div></div>`; 
         statusEl.textContent = 'No cards available'; 
-        saveState(); // Save the empty state
+        saveState(); 
         return; 
       }
       const card = getCurrentCard();
-      if (currentMode() === 'study') { renderStudy(card); } else if (currentMode() === 'mcq') { renderMcq(card); }
-      statusEl.textContent = `Card ${currentIndex + 1} of ${deck.length}${currentMode() === 'study' ? ' • randomized order' : ''}`;
+      if (currentMode() === 'study' || currentMode() === 'reverse') { renderStudy(card); } else if (currentMode() === 'mcq') { renderMcq(card); }
+      statusEl.textContent = `Card ${currentIndex + 1} of ${deck.length}${(currentMode() === 'study' || currentMode() === 'reverse') ? ' • randomized order' : ''}`;
       toggleChineseBtn.textContent = `Chinese: ${showChinese ? 'On' : 'Off'} (C)`;
-      toggleAnswerBtn.disabled = currentMode() !== 'study';
       
-      saveState(); // <--- Takes a snapshot of your progress every time the screen updates!
+      // Allow flipping in both study and reverse modes
+      toggleAnswerBtn.disabled = (currentMode() !== 'study' && currentMode() !== 'reverse');
+      
+      saveState(); 
     }
 
     function toggleAnswer() {
-      if (currentMode() !== 'study' || !activeDeck().length) return;
+      if ((currentMode() !== 'study' && currentMode() !== 'reverse') || !activeDeck().length) return;
       showBack = !showBack;
       const shell = document.getElementById('flashcardShell');
       if (shell) {

@@ -553,6 +553,27 @@
       studyOrder = restored;
     }
 
+	const STOP_WORDS = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'it', 'this', 'that', 'which', 'as', 'be', 'from', 'can', 'an', 'how', 'what', 'when', 'where', 'why']);
+
+	function getKeywords(text) {
+	  if (!text) return new Set();
+	  // Convert to lowercase, remove punctuation, split into words, and filter out stop words/short words
+	  const words = text.toLowerCase().replace(/[^\w\s]/g, '').split(/\s+/);
+	  return new Set(words.filter(word => word.length > 2 && !STOP_WORDS.has(word)));
+	}
+
+	function calculateMatchScore(promptText, candidateText) {
+	  const promptWords = getKeywords(promptText);
+	  const candidateWords = getKeywords(candidateText);
+	  let score = 0;
+	  for (const word of promptWords) {
+		if (candidateWords.has(word)) {
+		  score++;
+		}
+	  }
+	  return score;
+	}
+
     async function loadCards() {
       try {
         const response = await fetch('cards.json');
@@ -689,40 +710,101 @@
     }
 
     function buildMcqOptions(card) {
-      const direction = Math.random() < 0.5 ? 'front-to-back' : 'back-to-front';
-      const correct = direction === 'front-to-back' ? card.back : card.front;
-      const pool = shuffled(filteredCards.filter(c => c.id !== card.id)).map(c => (direction === 'front-to-back' ? c.back : c.front)).filter(Boolean);
-      const distractors = [];
-      for (const candidate of pool) { if (candidate !== correct && !distractors.includes(candidate)) distractors.push(candidate); if (distractors.length === 3) break; }
-      const options = shuffled([correct, ...distractors]).slice(0, 4);
-      return { direction, correct, options };
-    }
+	  const direction = Math.random() < 0.5 ? 'front-to-back' : 'back-to-front';
+	  const correct = direction === 'front-to-back' ? card.back : card.front;
+	  const promptText = direction === 'front-to-back' ? card.front : card.back;
+	  
+	  const otherCards = filteredCards.filter(c => c.id !== card.id);
+
+	  // Helper to score and sort a tier
+	  function processTier(tierArray) {
+		return tierArray.map(c => {
+		  const candidateText = direction === 'front-to-back' ? c.back : c.front;
+		  const score = calculateMatchScore(promptText, candidateText);
+		  return { text: candidateText, score: score };
+		})
+		// Sort by score (highest first), randomize if scores are tied
+		.sort((a, b) => b.score - a.score || Math.random() - 0.5)
+		.map(item => item.text);
+	  }
+
+	  // Build the tiers
+	  const tier1 = otherCards.filter(c => c.category === card.category && c.unit === card.unit);
+	  const tier2 = otherCards.filter(c => c.category === card.category && c.unit !== card.unit);
+	  const tier3 = otherCards.filter(c => c.category !== card.category);
+
+	  // Process and combine
+	  const orderedPool = [
+		...processTier(tier1), 
+		...processTier(tier2), 
+		...processTier(tier3)
+	  ];
+
+	  const distractors = [];
+	  for (const candidate of orderedPool) {
+		if (candidate && candidate !== correct && !distractors.includes(candidate)) {
+		  distractors.push(candidate);
+		}
+		if (distractors.length === 3) break;
+	  }
+
+	  const options = shuffled([correct, ...distractors]).slice(0, 4);
+	  return { direction, correct, options };
+	}
 
     function renderMcq(card) {
-      const { direction, correct, options } = buildMcqOptions(card);
-      const prompt = direction === 'front-to-back' ? `Choose the correct answer for: ${card.front}` : `Choose the matching term for: ${card.back}`;
-      cardStageEl.innerHTML = `
-        <div class="panel-content">
-          <div class="meta">${renderMeta(card)}</div>
-          <div class="face-center" style="width: 100%;">
-            <div class="front" style="font-size: clamp(24px, 3vw, 34px); max-width: 18ch;">Multiple Choice</div>
-            ${showChinese && card.front_zh ? `<div class="zh">参考: ${card.front_zh}</div>` : ''}
-            <div style="font-size: clamp(18px, 2vw, 24px); line-height: 1.5; max-width: 32ch;">${prompt}</div>
-            <div class="choices" id="choices"></div>
-            <div class="feedback" id="mcqFeedback"></div>
-          </div>
-        </div>
-      `;
-      const choicesEl = document.getElementById('choices');
-      const mcqFeedbackEl = document.getElementById('mcqFeedback');
-      options.forEach(option => {
-        const btn = document.createElement('button'); btn.className = 'choice'; btn.textContent = option;
-        btn.addEventListener('click', () => {
-          const isCorrect = option === correct; mcqFeedbackEl.textContent = isCorrect ? 'Correct!' : 'Not quite.'; mcqFeedbackEl.className = `feedback ${isCorrect ? 'ok' : 'bad'}`;
-        });
-        choicesEl.appendChild(btn);
-      });
-    }
+	  const { direction, correct, options } = buildMcqOptions(card);
+	  
+	  const promptText = direction === 'front-to-back' ? card.front : card.back;
+
+	  cardStageEl.innerHTML = `
+		<div class="panel-content">
+		  <div class="meta">${renderMeta(card)}</div>
+		  <div class="face-center" style="width: 100%;">
+			<div class="front" style="font-size: clamp(28px, 4vw, 42px); line-height: 1.2; max-width: 95%; text-wrap: balance;">
+			  ${promptText}
+			</div>
+			${showChinese && card.front_zh ? `<div class="zh" style="margin-top: 8px;">参考: ${card.front_zh}</div>` : ''}
+			<div class="choices" id="choices" style="margin-top: 24px;"></div>
+			<div class="feedback" id="mcqFeedback"></div>
+		  </div>
+		</div>
+	  `;
+	  
+	  const choicesEl = document.getElementById('choices');
+	  const mcqFeedbackEl = document.getElementById('mcqFeedback');
+	  
+	  options.forEach(option => {
+		const btn = document.createElement('button'); 
+		btn.className = 'choice'; 
+		btn.textContent = option;
+		
+		btn.addEventListener('click', () => {
+		  // Lock the choices immediately so they only get one try
+		  if (choicesEl.classList.contains('locked')) return;
+		  choicesEl.classList.add('locked'); 
+
+		  const isCorrect = option === correct; 
+		  mcqFeedbackEl.textContent = isCorrect ? 'Correct!' : 'Not quite. The correct answer is highlighted.'; 
+		  mcqFeedbackEl.className = `feedback ${isCorrect ? 'ok' : 'bad'}`;
+		  
+		  if (isCorrect) {
+			btn.classList.add('correct');
+		  } else {
+			// Highlight their wrong choice in red
+			btn.classList.add('incorrect');
+			// Find the correct button and highlight it in green
+			const allBtns = choicesEl.querySelectorAll('.choice');
+			allBtns.forEach(b => {
+			  if (b.textContent === correct) {
+				b.classList.add('correct');
+			  }
+			});
+		  }
+		});
+		choicesEl.appendChild(btn);
+	  });
+	}
 
     function renderCurrent() {
       resetPositionIfNeeded(); const deck = activeDeck();

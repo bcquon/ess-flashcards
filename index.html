@@ -619,7 +619,8 @@
           applyFilters();
         }
       } catch (error) {
-        cardStageEl.innerHTML = `<div class="panel-content empty-state"><div style="font-size: 28px; font-weight: 800; color: var(--text);">Error loading cards.json</div></div>`;
+        console.error("Failed to load or parse cards:", error);
+        cardStageEl.innerHTML = `<div class="panel-content empty-state"><div style="font-size: 28px; font-weight: 800; color: var(--text);">Error loading cards.json:<br><span style="font-size: 16px">${error.message}</span></div></div>`;
       }
     }
 

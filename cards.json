@@ -2535,7 +2535,7 @@
     "back_zh": "通过燃烧生物量样本并观察水的升温情况，从而计算其内部储存的能量。",
     "keywords": ["burning", "heat water", "stored energy"],
     "image": "calorimetry.png"
-  }
+  },
   {
     "id": "u2-concept-2nd-law-and-ecosystems-sl",
     "unit": "Unit 2",

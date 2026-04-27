@@ -328,6 +328,28 @@
       box-shadow: 0 10px 24px rgba(15, 23, 42, 0.08);
       margin: 0 auto; 
     }
+	
+	.full-image-below {
+	  margin-top: 24px;
+	  width: 100%;
+	  display: none;
+	}
+
+	.full-image-below.show {
+	  display: block;
+	}
+
+	.full-image-below img {
+	  width: auto;
+	  max-width: 100%;
+	  height: auto;
+	  display: block;
+	  margin: 0 auto;
+	  border: 1px solid var(--line);
+	  border-radius: 16px;
+	  background: #fff;
+	  box-shadow: var(--shadow);
+	}
 
     .card-image[src=""], .card-image:not([src]) {
       display: none;
@@ -686,9 +708,11 @@
       const frontZh = showChinese && (isReverse ? card.back_zh : card.front_zh) ? `<div class="zh">${isReverse ? card.back_zh : card.front_zh}</div>` : '';
       const backZh = showChinese && (isReverse ? card.front_zh : card.back_zh) ? `<div class="zh">${isReverse ? card.front_zh : card.back_zh}</div>` : '';
       
-      const imageHtml = card.image ? `<img class="card-image" src="images/${card.image}" alt="Card visual" />` : '';
-      const frontImage = isReverse ? imageHtml : '';
-      const backImage = isReverse ? '' : imageHtml;
+	  const imageBelowHtml = card.image
+	    ? `<div class="full-image-below" id="fullImageBelow">
+		     <img src="images/${card.image}" alt="Card visual">
+		   </div>`
+	    : '';
 
       cardStageEl.innerHTML = `
         <button class="flashcard-shell" id="flashcardShell" aria-label="Flip card">
@@ -698,7 +722,6 @@
               <div class="face-center">
                 <div class="${isReverse ? 'back-text' : 'front'}">${frontText}</div>
                 ${frontZh}
-                ${frontImage}
               </div>
               <div class="face-footer">Click the card to flip</div>
             </div>
@@ -707,12 +730,12 @@
               <div class="face-center">
                 <div class="${isReverse ? 'front' : 'back-text'}">${backText}</div>
                 ${backZh}
-                ${backImage}
               </div>
               <div class="face-footer">Click the card to flip back</div>
             </div>
           </div>
         </button>
+		${imageBelowHtml}
       `;
       
       document.getElementById('flashcardShell').addEventListener('click', toggleAnswer);
@@ -834,6 +857,12 @@
         if (showBack) shell.classList.add('is-flipped');
         else shell.classList.remove('is-flipped');
       }
+	  
+	  const fullImageBelow = document.getElementById('fullImageBelow');
+	  if (fullImageBelow) {
+		fullImageBelow.classList.toggle('show', showBack);
+	  }
+	  
       toggleAnswerBtn.textContent = showBack ? 'Flip to front (Space)' : 'Flip card (Space)';
     }
 

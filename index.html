@@ -155,7 +155,13 @@
       align-items: center;
       gap: 10px;
     }
-
+	
+	.front,
+	.back-text,
+	.zh {
+	  white-space: pre-line;
+	}
+	
     .controls {
       display: flex;
       gap: 10px;
@@ -765,14 +771,18 @@
 
     function renderMeta(card) { return [card.unit, card.level, card.category].filter(Boolean).map(tag => `<span class="pill">${tag}</span>`).join(''); }
 
+	function formatText(text) {
+	  return String(text || '').replace(/\\n/g, '\n');
+	}
+
     function renderStudy(card) {
       const isReverse = currentMode() === 'reverse';
 
       const frontText = isReverse ? card.back : card.front;
       const backText = isReverse ? card.front : card.back;
       
-      const frontZh = showChinese && (isReverse ? card.back_zh : card.front_zh) ? `<div class="zh">${isReverse ? card.back_zh : card.front_zh}</div>` : '';
-      const backZh = showChinese && (isReverse ? card.front_zh : card.back_zh) ? `<div class="zh">${isReverse ? card.front_zh : card.back_zh}</div>` : '';
+      const frontZh = showChinese && (isReverse ? card.back_zh : card.front_zh) ? `<div class="zh">${formatText(isReverse ? card.back_zh : card.front_zh)}</div>` : '';
+      const backZh = showChinese && (isReverse ? card.front_zh : card.back_zh) ? `<div class="zh">${formatText(isReverse ? card.front_zh : card.back_zh)}</div>` : '';
       
 	  const imageBelowHtml = card.image
 	    ? `<div class="full-image-below" id="fullImageBelow">
@@ -786,7 +796,7 @@
             <div class="card-face front-face">
               <div class="meta">${renderMeta(card)}</div>
               <div class="face-center">
-                <div class="${isReverse ? 'back-text' : 'front'}">${frontText}</div>
+                <div class="${isReverse ? 'back-text' : 'front'}">${formatText(frontText)}</div>
                 ${frontZh}
               </div>
               <div class="face-footer">Click the card to flip</div>
@@ -794,7 +804,7 @@
             <div class="card-face back-face">
               <div class="meta">${renderMeta(card)}</div>
               <div class="face-center">
-                <div class="${isReverse ? 'front' : 'back-text'}">${backText}</div>
+                <div class="${isReverse ? 'front' : 'back-text'}">${formatText(backText)}</div>
                 ${backZh}
               </div>
               <div class="face-footer">Click the card to flip back</div>

@@ -5574,16 +5574,16 @@
     "image": ""
   },
   {
-    "id": "unit-8-concept-demographic-tools-sl",
+    "id": "unit-8-vocab-cbr-sl",
     "unit": "Unit 8",
     "level": "SL",
-    "category": "concept",
-    "front": "Demographic Tools for Quantifying Human Population",
-    "back": "Crude Birth Rate, Crude Death Rate, Total Fertility Rate, Doubling Time, Natural Increase, Life Expectancy",
-    "front_zh": "量化人类人口的人口统计工具",
-    "back_zh": "粗出生率、粗死亡率、总和生育率、倍增时间、自然增长率、预期寿命。",
-    "keywords": ["tools", "quantifying", "metrics"],
-    "image": ""
+    "category": "vocab",
+    "front": "Crude Birth Rate (CBR)",
+    "back": "Number of Births/1000 people. Calculation: (Number of births ÷ Total population) × 1000. Units are 'per thousand people'",
+    "front_zh": "粗出生率 (CBR)",
+    "back_zh": "每千人的出生人数。计算方法：(出生人数 ÷ 总人口) × 1000。单位为“每千人”",
+    "keywords": ["CBR", "birth rate", "calculation"],
+    "image": "calculationunits.png"
   },
   {
     "id": "unit-8-vocab-cdr-sl",
@@ -5591,9 +5591,9 @@
     "level": "SL",
     "category": "vocab",
     "front": "Crude Death Rate (CDR)",
-    "back": "Number of deaths/1000 people. Calculation: $$\\frac{\\text{Number of deaths}}{\\text{Total population}} \\times 1000$$. Units are 'per thousand people'",
+    "back": "Number of deaths/1000 people. Calculation: (Number of deaths ÷ Total population) × 1000. Units are 'per thousand people'",
     "front_zh": "粗死亡率 (CDR)",
-    "back_zh": "每千人的死亡人数。计算方法：$$\\frac{\\text{死亡人数}}{\\text{总人口}} \\times 1000$$。单位为“每千人”",
+    "back_zh": "每千人的死亡人数。计算方法：(死亡人数 ÷ 总人口) × 1000。单位为“每千人”",
     "keywords": ["CDR", "death rate", "calculation"],
     "image": "calculationunits.png"
   },
@@ -5639,9 +5639,9 @@
     "level": "SL",
     "category": "vocab",
     "front": "Natural Increase (NI)",
-    "back": "The percentage growth in a population every year. Calculation = $$\\frac{CBR-CDR}{10}$$. The unit is a percentage.",
+    "back": "The percentage growth in a population every year. Calculation = (CBR - CDR) ÷ 10. The unit is a percentage.",
     "front_zh": "自然增长率 (NI)",
-    "back_zh": "人口每年的百分比增长。计算方法 = $$\\frac{CBR-CDR}{10}$$。单位为百分比。",
+    "back_zh": "人口每年的百分比增长。计算方法 = (CBR - CDR) ÷ 10。单位为百分比。",
     "keywords": ["natural increase", "NI", "percentage growth"],
     "image": "calculationunits.png"
   },

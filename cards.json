@@ -6651,7 +6651,7 @@
     "front_zh": "污染管理的三个级别 - 酸雨第 1 级",
     "back_zh": "改变人类活动以在问题发生前进行预防 —— 使用化石燃料的替代品，通过游说鼓励减少污染物的产生，更好的消费者选择，公共交通和拼车",
     "keywords": ["prevention", "behavior", "fossil fuel alternatives"],
-    "image": ""
+    "image": "airpollutantslevel1.png"
   },
   {
     "id": "unit-8-concept-three-levels-of-pollution-management-acid-rain-level-2-sl",
@@ -6663,7 +6663,7 @@
     "front_zh": "污染管理的三个级别 - 酸雨第 2 级",
     "back_zh": "控制污染物的排放以限制其数量 —— 使用工业洗涤器，制定排放标准（如“总量管制与交易”），国际协议，使用催化转化器",
     "keywords": ["regulation", "scrubbers", "emissions standards"],
-    "image": ""
+    "image": "airpollutantslevel2.png"
   },
   {
     "id": "unit-8-concept-three-levels-of-pollution-management-acid-rain-level-3-sl",
@@ -6675,7 +6675,7 @@
     "front_zh": "污染管理的三个级别 - 酸雨第 3 级",
     "back_zh": "污染物排放后对环境的清理/恢复 —— 向湖泊和河流中添加石灰以中和酸性（施放石灰），向土壤中添加石灰以中和酸性（施放石灰），重新植树造林",
     "keywords": ["liming", "restoration", "acid rain", "cleanup"],
-    "image": ""
+    "image": "airpollutantslevel3.png"
   },
   {
     "id": "test-prep-concept-paper-1-sustainability-questions-sl",

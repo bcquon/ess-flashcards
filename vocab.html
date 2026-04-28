@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IB ESS Vocabulary Table</title>
+  <style>
+    :root {
+      --bg-1: #eef4ff;
+      --bg-2: #f8fbff;
+      --panel: rgba(255, 255, 255, 0.78);
+      --panel-strong: #ffffff;
+      --text: #18212f;
+      --muted: #64748b;
+      --line: rgba(148, 163, 184, 0.28);
+      --accent: #2563eb;
+      --accent-2: #1d4ed8;
+      --accent-soft: rgba(37, 99, 235, 0.12);
+      --shadow: 0 18px 50px rgba(15, 23, 42, 0.10);
+      --radius: 20px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(37, 99, 235, 0.10), transparent 32%),
+        radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 28%),
+        linear-gradient(180deg, var(--bg-1), var(--bg-2));
+      padding: 24px 16px 40px;
+    }
+
+    .container {
+      width: min(1180px, 100%);
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    header {
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding-top: 10px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 38px);
+      letter-spacing: -0.03em;
+    }
+
+    .muted {
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .top-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .nav-link, button, select, input[type="search"] {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 10px 14px;
+      font-size: 14px;
+      background: rgba(255,255,255,0.98);
+      color: var(--text);
+      transition: 0.18s ease;
+    }
+
+    .nav-link {
+      text-decoration: none;
+      border-radius: 999px;
+      color: var(--accent-2);
+      font-weight: 700;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    button { cursor: pointer; }
+
+    .primary {
+      background: linear-gradient(180deg, var(--accent), var(--accent-2));
+      color: white;
+      border-color: transparent;
+      box-shadow: 0 10px 24px rgba(37, 99, 235, 0.22);
+    }
+
+    .nav-link:hover, button:hover, select:hover, input[type="search"]:hover {
+      transform: translateY(-1px);
+      border-color: rgba(37, 99, 235, 0.28);
+      box-shadow: 0 12px 26px rgba(37, 99, 235, 0.10);
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1.4fr 0.7fr auto;
+      gap: 12px;
+      align-items: center;
+    }
+
+    input[type="search"], select { width: 100%; }
+
+    .status {
+      color: var(--muted);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border-radius: 20px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.78);
+      box-shadow: var(--shadow);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 760px;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      background: rgba(248, 250, 252, 0.96);
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      z-index: 1;
+    }
+
+    td {
+      vertical-align: top;
+      padding: 16px;
+      border-bottom: 1px solid var(--line);
+      line-height: 1.45;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tbody tr:hover { background: rgba(37, 99, 235, 0.045); }
+
+    .unit-cell {
+      white-space: nowrap;
+      font-weight: 800;
+      color: var(--accent-2);
+    }
+
+    .word {
+      font-weight: 800;
+      font-size: 16px;
+    }
+
+    .definition {
+      max-width: 720px;
+    }
+
+    .zh-line {
+      display: none;
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    body.show-zh .zh-line { display: block; }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 16px;
+      color: var(--muted);
+    }
+
+    mark {
+      background: #fef08a;
+      color: inherit;
+      border-radius: 5px;
+      padding: 0 2px;
+    }
+
+    @media (max-width: 760px) {
+      .toolbar { grid-template-columns: 1fr; }
+      body { padding-inline: 12px; }
+      .panel { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>IB ESS Vocabulary Table</h1>
+      <p class="muted">Vocabulary cards are pulled from <strong>cards.json</strong>, sorted by unit, then alphabetically.</p>
+      <nav class="top-actions" aria-label="Study tools">
+        <a class="nav-link" href="index.html">Back to Flashcards</a>
+      </nav>
+    </header>
+
+    <section class="panel toolbar">
+      <input id="searchInput" type="search" placeholder="Search word or definition..." />
+      <select id="unitSelect" aria-label="Filter by unit">
+        <option value="all">All units</option>
+      </select>
+      <button id="toggleChineseBtn" class="primary">Chinese: Off (C)</button>
+    </section>
+
+    <div class="status" id="status">Loading vocabulary...</div>
+
+    <section class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Unit</th>
+            <th>English vocab word</th>
+            <th>English definition</th>
+          </tr>
+        </thead>
+        <tbody id="vocabBody"></tbody>
+      </table>
+    </section>
+  </div>
+
+  <script>
+    let allVocab = [];
+    let showChinese = false;
+
+    const vocabBody = document.getElementById('vocabBody');
+    const searchInput = document.getElementById('searchInput');
+    const unitSelect = document.getElementById('unitSelect');
+    const statusEl = document.getElementById('status');
+    const toggleChineseBtn = document.getElementById('toggleChineseBtn');
+
+    function unitNumber(unit) {
+      const match = String(unit || '').match(/\d+/);
+      return match ? Number(match[0]) : 999;
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function highlight(text, query) {
+      const safe = escapeHtml(text);
+      if (!query) return safe;
+      const escapedQuery = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      return safe.replace(new RegExp(`(${escapedQuery})`, 'ig'), '<mark>$1</mark>');
+    }
+
+    function buildUnitOptions() {
+      const units = [...new Set(allVocab.map(card => card.unit).filter(Boolean))]
+        .sort((a, b) => unitNumber(a) - unitNumber(b) || a.localeCompare(b));
+      for (const unit of units) {
+        const option = document.createElement('option');
+        option.value = unit;
+        option.textContent = unit;
+        unitSelect.appendChild(option);
+      }
+    }
+
+    function filteredVocab() {
+      const query = searchInput.value.trim().toLowerCase();
+      const selectedUnit = unitSelect.value;
+      return allVocab.filter(card => {
+        const unitMatch = selectedUnit === 'all' || card.unit === selectedUnit;
+        const haystack = `${card.front || ''} ${card.back || ''} ${card.front_zh || ''} ${card.back_zh || ''}`.toLowerCase();
+        const searchMatch = !query || haystack.includes(query);
+        return unitMatch && searchMatch;
+      });
+    }
+
+    function renderTable() {
+      const query = searchInput.value.trim();
+      const cards = filteredVocab();
+      vocabBody.innerHTML = '';
+
+      if (!cards.length) {
+        vocabBody.innerHTML = `<tr><td colspan="3" class="empty-state">No vocabulary matches this search.</td></tr>`;
+      } else {
+        for (const card of cards) {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td class="unit-cell">${escapeHtml(card.unit)}</td>
+            <td>
+              <div class="word">${highlight(card.front, query)}</div>
+              <div class="zh-line">${escapeHtml(card.front_zh)}</div>
+            </td>
+            <td class="definition">
+              <div>${highlight(card.back, query)}</div>
+              <div class="zh-line">${escapeHtml(card.back_zh)}</div>
+            </td>
+          `;
+          vocabBody.appendChild(row);
+        }
+      }
+
+      document.body.classList.toggle('show-zh', showChinese);
+      toggleChineseBtn.textContent = `Chinese: ${showChinese ? 'On' : 'Off'} (C)`;
+      statusEl.textContent = `${cards.length} vocabulary terms shown`;
+    }
+
+    function toggleChinese() {
+      showChinese = !showChinese;
+      renderTable();
+    }
+
+    async function loadVocabulary() {
+      try {
+        const response = await fetch('cards.json');
+        const cards = await response.json();
+        allVocab = cards
+          .filter(card => card.category === 'vocab')
+          .sort((a, b) => unitNumber(a.unit) - unitNumber(b.unit) || String(a.front).localeCompare(String(b.front)));
+        buildUnitOptions();
+        renderTable();
+      } catch (error) {
+        statusEl.textContent = `Error loading cards.json: ${error.message}`;
+        vocabBody.innerHTML = `<tr><td colspan="3" class="empty-state">Could not load vocabulary.</td></tr>`;
+      }
+    }
+
+    searchInput.addEventListener('input', renderTable);
+    unitSelect.addEventListener('change', renderTable);
+    toggleChineseBtn.addEventListener('click', toggleChinese);
+
+    document.addEventListener('keydown', (event) => {
+      const target = event.target;
+      const typing = target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT');
+      if ((event.key === 'c' || event.key === 'C') && !typing) {
+        event.preventDefault();
+        toggleChinese();
+      }
+    });
+
+    loadVocabulary();
+  </script>
+</body>
+</html>

@@ -65,6 +65,37 @@
       text-align: center;
     }
 
+    .top-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: -4px;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.92);
+      color: var(--accent-2);
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+      transition: 0.18s ease;
+    }
+
+    .nav-link:hover {
+      transform: translateY(-1px);
+      border-color: rgba(37, 99, 235, 0.28);
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.12);
+    }
+
     .panel {
       width: min(1000px, 100%);
       background: var(--panel);
@@ -474,7 +505,38 @@
 
       .card-face,
       .panel-content,
-      .panel {
+      .top-actions {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: -4px;
+    }
+
+    .nav-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      text-decoration: none;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: rgba(255,255,255,0.92);
+      color: var(--accent-2);
+      font-weight: 700;
+      font-size: 14px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+      transition: 0.18s ease;
+    }
+
+    .nav-link:hover {
+      transform: translateY(-1px);
+      border-color: rgba(37, 99, 235, 0.28);
+      box-shadow: 0 14px 28px rgba(37, 99, 235, 0.12);
+    }
+
+    .panel {
         padding: 16px;
       }
 
@@ -490,6 +552,10 @@
   <div class="container">
     <h1>IB ESS Flashcards</h1>
     <p class="muted">Choose filters, study with randomized cards, and flip the center card like a real flashcard.</p>
+
+    <nav class="top-actions" aria-label="Study tools">
+      <a class="nav-link" href="vocab.html">Vocabulary Table</a>
+    </nav>
 
     <section class="panel filters">
       <div>
@@ -542,7 +608,7 @@
     const DEFAULT_CATEGORIES = ['vocab', 'concept'];
     const STOP_WORDS = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'it', 'this', 'that', 'which', 'as', 'be', 'from', 'can', 'an', 'how', 'what', 'when', 'where', 'why']);
 
-    let allCards = []; let filteredCards = []; let studyOrder = []; let currentIndex = 0; let showChinese = false; let showBack = false;
+    let allCards = []; let filteredCards = []; let studyOrder = []; let currentIndex = 0; let showChinese = false; let showBack = false; let currentMcq = null;
 
     const unitFiltersEl = document.getElementById('unitFilters');
     const levelFiltersEl = document.getElementById('levelFilters');
@@ -675,7 +741,7 @@
     
     function selectedValues(container) { return Array.from(container.querySelectorAll('input[type="checkbox"]:checked')).map(el => el.value); }
     function shuffled(array) { const copy = [...array]; for (let i = copy.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [copy[i], copy[j]] = [copy[j], copy[i]]; } return copy; }
-    function rebuildStudyOrder() { studyOrder = shuffled(filteredCards); currentIndex = 0; showBack = false; }
+    function rebuildStudyOrder() { studyOrder = shuffled(filteredCards); currentIndex = 0; showBack = false; currentMcq = null; }
 
     function applyFilters() {
       const units = selectedValues(unitFiltersEl); const levels = selectedValues(levelFiltersEl); const categories = selectedValues(categoryFiltersEl);
@@ -782,8 +848,20 @@
     }
 
     function renderMcq(card) {
-      const { direction, correct, options } = buildMcqOptions(card);
+      if (!currentMcq || currentMcq.cardId !== card.id) {
+        const built = buildMcqOptions(card);
+        currentMcq = {
+          cardId: card.id,
+          direction: built.direction,
+          correct: built.correct,
+          options: built.options,
+          selected: null
+        };
+      }
+
+      const { direction, correct, options, selected } = currentMcq;
       const promptText = direction === 'front-to-back' ? card.front : card.back;
+      const promptZh = direction === 'front-to-back' ? card.front_zh : card.back_zh;
 
       cardStageEl.innerHTML = `
         <div class="panel-content">
@@ -792,7 +870,7 @@
             <div class="front" style="font-size: clamp(28px, 4vw, 42px); line-height: 1.2; max-width: 95%; text-wrap: balance;">
               ${promptText}
             </div>
-            ${showChinese && card.front_zh ? `<div class="zh" style="margin-top: 8px;">参考: ${card.front_zh}</div>` : ''}
+            <div id="mcqChineseRef" class="zh" style="margin-top: 8px; display: ${showChinese && promptZh ? 'block' : 'none'};">参考: ${promptZh || ''}</div>
             <div class="choices" id="choices" style="margin-top: 24px;"></div>
             <div class="feedback" id="mcqFeedback"></div>
           </div>
@@ -808,12 +886,16 @@
         btn.textContent = option;
         
         const isCorrect = option === correct;
-        if (isCorrect) {
-          btn.dataset.correct = "true";
+        if (isCorrect) btn.dataset.correct = "true";
+        if (selected) {
+          choicesEl.classList.add('locked');
+          if (isCorrect) btn.classList.add('correct');
+          if (option === selected && !isCorrect) btn.classList.add('incorrect');
         }
         
         btn.addEventListener('click', () => {
           if (choicesEl.classList.contains('locked')) return;
+          currentMcq.selected = option;
           choicesEl.classList.add('locked'); 
 
           mcqFeedbackEl.textContent = isCorrect ? 'Correct!' : 'Not quite. The correct answer is highlighted.'; 
@@ -829,6 +911,12 @@
         });
         choicesEl.appendChild(btn);
       });
+
+      if (selected) {
+        const wasCorrect = selected === correct;
+        mcqFeedbackEl.textContent = wasCorrect ? 'Correct!' : 'Not quite. The correct answer is highlighted.';
+        mcqFeedbackEl.className = `feedback ${wasCorrect ? 'ok' : 'bad'}`;
+      }
     }
 
     function renderCurrent() {
@@ -866,11 +954,26 @@
       toggleAnswerBtn.textContent = showBack ? 'Flip to front (Space)' : 'Flip card (Space)';
     }
 
-    function nextCard() { const deck = activeDeck(); if (!deck.length) return; currentIndex = (currentIndex + 1) % deck.length; showBack = false; renderCurrent(); }
-    function previousCard() { const deck = activeDeck(); if (!deck.length) return; currentIndex = (currentIndex - 1 + deck.length) % deck.length; showBack = false; renderCurrent(); }
-    function toggleChinese() { showChinese = !showChinese; renderCurrent(); }
+    function nextCard() { const deck = activeDeck(); if (!deck.length) return; currentIndex = (currentIndex + 1) % deck.length; showBack = false; currentMcq = null; renderCurrent(); }
+    function previousCard() { const deck = activeDeck(); if (!deck.length) return; currentIndex = (currentIndex - 1 + deck.length) % deck.length; showBack = false; currentMcq = null; renderCurrent(); }
+    function toggleChinese() {
+      showChinese = !showChinese;
+      toggleChineseBtn.textContent = `Chinese: ${showChinese ? 'On' : 'Off'} (C)`;
+      if (currentMode() === 'mcq') {
+        const card = getCurrentCard();
+        const promptZh = currentMcq && currentMcq.direction === 'back-to-front' ? card.back_zh : card.front_zh;
+        const mcqChineseRef = document.getElementById('mcqChineseRef');
+        if (mcqChineseRef) {
+          mcqChineseRef.textContent = promptZh ? `参考: ${promptZh}` : '';
+          mcqChineseRef.style.display = showChinese && promptZh ? 'block' : 'none';
+        }
+        saveState();
+      } else {
+        renderCurrent();
+      }
+    }
 
-    modeSelectEl.addEventListener('change', () => { currentIndex = 0; showBack = false; renderCurrent(); });
+    modeSelectEl.addEventListener('change', () => { currentIndex = 0; showBack = false; currentMcq = null; renderCurrent(); });
     toggleAnswerBtn.addEventListener('click', toggleAnswer);
     toggleChineseBtn.addEventListener('click', toggleChinese);
     nextBtn.addEventListener('click', nextCard);

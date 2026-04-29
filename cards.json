@@ -1,5 +1,5 @@
 [
-    {
+  {
     "id": "u1-vocab-perspective-sl",
     "unit": "Unit 1",
     "level": "SL",
@@ -89,7 +89,7 @@
     "level": "SL",
     "category": "vocab",
     "front": "Values",
-    "back": "Principles or qualities that we feel have worth and importance in life (e.g. courage, honesty, empathy) These are the 'building blocks' that form a perspective.",
+    "back": "Principles or qualities that we feel have worth and importance in life (e.g. courage, honesty, empathy)\n\nThese are the 'building blocks' that form a perspective.",
     "front_zh": "价值观",
     "back_zh": "我们认为在生活中有价值、很重要的原则或品质（例如：勇气、诚实、同理心）。\n\n这些是构成一种视角的‘基本组成部分’。",
     "keywords": ["Principles"],
